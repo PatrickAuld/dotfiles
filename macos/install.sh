@@ -10,9 +10,8 @@ fi
 
 set -e
 
-if [ "$(uname -s)" == "Darwin" ]
-then
-  echo "› sudo softwareupdate -i -a"
-  sudo softwareupdate -i -a
-fi
+echo "› sudo softwareupdate -i -a"
+sudo softwareupdate -i -a
 
+echo "Installing xcode-tools. This will prompt"
+xcode-select --install
