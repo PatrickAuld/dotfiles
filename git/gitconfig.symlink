@@ -51,6 +51,9 @@
   # Remove whitespace changes
   rws = !git remove-whitespace-changes
 
+  # Deletes all branches that have been merged into `master` or `main`
+  delete-merged-branches = !git branch --merged | egrep -v '(^\\*|master|main)' | xargs git branch -d
+
 [color]
   diff = auto
   status = auto
@@ -81,7 +84,7 @@
   # for more information on different options of the below setting.
   #
   # Setting to git 2.0 default to suppress warning message
-  default = simple
+	default = current
 
 [credential]
   # See `git help config` (search for push.default)
