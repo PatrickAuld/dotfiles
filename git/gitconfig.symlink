@@ -63,6 +63,8 @@
 [core]
   excludesfile = ~/.gitignore
 	editor = vim
+	fsmonitor = true
+	untrackedcache = true
 
 [apply]
   whitespace = nowarn
