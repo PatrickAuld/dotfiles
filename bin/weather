@@ -7,7 +7,7 @@ set -e
 
 usage() {
   cat << EOF
-Usage: $0 <location. Default 94110>
+Usage: $0 <location. Default 94501>
 
 Queries the weather report for a given location. This
 can be a zipcode or city.
@@ -23,5 +23,5 @@ while getopts “h” OPTION; do
   esac
 done
 
-LOCATION=${1:-94110}
+LOCATION=${1:-94501}
 curl "wttr.in/$LOCATION"
