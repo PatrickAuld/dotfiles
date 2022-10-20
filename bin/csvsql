@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -e
+
+sqlite3 :memory: -cmd '.mode csv' -cmd ".import ${1} data" ${2}
