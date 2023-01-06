@@ -9,4 +9,3 @@ function _pip_completion {
 }
 compctl -K _pip_completion pip
 
-export PATH="/usr/local/opt/python/libexec/bin:$PATH"
