@@ -2,24 +2,34 @@
 export ZSH=$HOME/.dotfiles
 
 # your project folder that we can `c [tab]` to
-export PROJECTS=~/Documents/projects
+export PROJECTS=~/Documents/code
+
+# Load common utilities
+typeset -U util_files
+util_files=($ZSH/_util/*.zsh)
+for file in ${util_files}
+do
+  source $file
+done
+
+__log "Loading shell configuration..."
 
 # Stash your environment variables in ~/.localrc. This means they'll stay out
 # of your main dotfiles repository (which may be public, like this one), but
 # you'll have access to them in your scripts.
 if [[ -a ~/.localrc ]]
 then
-  source ~/.localrc
+  __source( ~/.localrc)
 fi
 
-# all of our zsh files
+# all of our zsh files in dirs not starting with a _
 typeset -U config_files
-config_files=($ZSH/**/*.zsh)
+config_files=($(find $ZSH -name '*.zsh' -not -path '_*'))
 
 # load the path files
 for file in ${(M)config_files:#*/path.zsh}
 do
-  source $file
+  __source $file
 done
 
 # initialize autocomplete here, otherwise functions won't be loaded
@@ -29,16 +39,17 @@ compinit
 # load everything but the path and completion files
 for file in ${${config_files:#*/path.zsh}:#*/completion.zsh}
 do
-  source $file
+  __source $file
 done
 
 # load every completion after autocomplete loads
 for file in ${(M)config_files:#*/completion.zsh}
 do
-  source $file
+  __source $file
 done
 
 unset config_files
+
 
 # Better history
 # Credits to https://coderwall.com/p/jpj_6q/zsh-better-history-searching-with-arrow-keys
@@ -48,3 +59,5 @@ zle -N up-line-or-beginning-search
 zle -N down-line-or-beginning-search
 bindkey "^[[A" up-line-or-beginning-search # Up
 bindkey "^[[B" down-line-or-beginning-search # Down
+
+__log "Shell loaded."
