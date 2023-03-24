@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Single user update from the Nix manual 
+# https://nixos.org/manual/nix/stable/installation/upgrading.html
+set -e
+
+nix-channel --update
+nix-env -iA nixpkgs.nix nixpkgs.cacert
