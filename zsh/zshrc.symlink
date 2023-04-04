@@ -19,7 +19,7 @@ __log "Loading shell configuration..."
 # you'll have access to them in your scripts.
 if [[ -a ~/.localrc ]]
 then
-  __source( ~/.localrc)
+  __source ~/.localrc
 fi
 
 # all of our zsh files in dirs not starting with a _
