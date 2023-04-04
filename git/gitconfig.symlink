@@ -54,6 +54,9 @@
   # Deletes all branches that have been merged into `master` or `main`
   delete-merged-branches = !git branch --merged | egrep -v '(^\\*|master|main)' | xargs git branch -d
 
+  # switch the main/master branch
+  sm = !git default-branch | xargs git switch
+
 [color]
   diff = auto
   status = auto
