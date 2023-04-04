@@ -32,12 +32,4 @@ setopt HIST_REDUCE_BLANKS
 #   like: git comm-[tab]
 setopt complete_aliases
 
-bindkey '^B' backward-word
-bindkey '^F' forward-word
-bindkey '^[[5D' beginning-of-line
-bindkey '^[[5C' end-of-line
-bindkey '^[[3~' delete-char
-bindkey 'e[3~' delete-char
-bindkey '^?' backward-delete-char
-
 set -o emacs
