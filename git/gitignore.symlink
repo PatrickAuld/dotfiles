@@ -8,3 +8,20 @@
 
 #NPM
 node_modules/
+
+# Intelij
+.idea/
+
+# Gradle
+.gradle
+
+# Cached Python objects
+*__pycache__*
+*.pyc
+
+# .direnv scratch space
+.direnv/
+
+# yarn related local cache files
+.yarn/cache
+.yarn/install-state.gz
