@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
 # https://nixos.org/download.html#nix-install-macos
 
