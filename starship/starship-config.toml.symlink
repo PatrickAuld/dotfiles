@@ -9,3 +9,12 @@ disabled = true
 
 [package]
 disabled = true
+
+[sudo]
+disabled = false
+
+[golang]
+symbol = 'Go '
+
+[nodejs]
+symbol = 'Node '
