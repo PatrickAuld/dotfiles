@@ -3,10 +3,11 @@ set -e
 
 INDEX=$(date +%Y-%m-%d.%H:%M)
 
-pushd ~/Library/CloudStorage/Dropbox
+pushd ~/Library/CloudStorage/Dropbox/Camera\ Uploads
 
 zip ~/Desktop/photoBackup-$INDEX.zip ./* 
 
 aws s3 cp --profile personal --storage-class STANDARD_IA ~/Desktop/photoBackup-$INDEX.zip s3://patrick-private/backups/
 
+echo 'rm ~/Library/CloudStorage/Dropbox/Camera\ Uploads/.*'
 echo "'popd' to return"
