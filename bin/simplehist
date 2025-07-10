@@ -2,4 +2,52 @@
 
 set -e
 
+show_help() {
+    cat << EOF
+simplehist - Create a simple histogram from input data
+
+Usage: simplehist [options]
+
+Reads data from stdin, counts occurrences of each unique value, and displays
+a histogram with bars made of pipe characters (|). The output shows each
+unique value followed by its count and a visual bar representation.
+
+Options:
+    -h, --help    Show this help message
+
+Examples:
+    # Count occurrences of words in a file
+    cat words.txt | simplehist
+
+    # Histogram of HTTP status codes from access logs
+    awk '{print \$9}' access.log | simplehist
+
+    # Count file extensions in current directory
+    ls -1 | grep -o '\.[^.]*\$' | simplehist
+
+    # Histogram of shell commands from history
+    history | awk '{print \$2}' | simplehist
+
+    # Count unique values from a column of data
+    cut -d, -f2 data.csv | simplehist
+
+Output format:
+    Each line shows: value count |||||||||
+    Where the number of pipes (|) represents the count visually.
+EOF
+}
+
+# Check for help flags
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_help
+    exit 0
+fi
+
+# Check for any other arguments (which would be invalid)
+if [[ $# -gt 0 ]]; then
+    echo "Error: Unknown argument '$1'"
+    echo "Run 'simplehist --help' for usage information"
+    exit 1
+fi
+
 sort | uniq -c | awk '{print $2" "$1}' | perl -pe 's/(\d+)$/"|"x$1/e'

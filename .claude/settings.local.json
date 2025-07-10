@@ -14,7 +14,8 @@
       "Bash(./bin/edit-changed:*)",
       "Bash(./bin/git-default-branch --help)",
       "Bash(./bin/git-default-branch)",
-      "Bash(./bin/git-default-branch --no-cache)"
+      "Bash(./bin/git-default-branch --no-cache)",
+      "Bash(./bin/simplehist:*)"
     ],
     "deny": []
   }
