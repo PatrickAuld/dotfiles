@@ -2,8 +2,110 @@
 #
 # Prints the "default" branch for the repo
 #
+# Uses cached value from git config if available, otherwise queries remote
+# and caches the result for future use.
+#
 # Examples
 #
-#   git default-branch
+#   git default-branch           # Use cached value if available
+#   git default-branch --no-cache # Skip cache, query remote directly
+#   git default-branch --refresh  # Update cache and return new value
 
-git remote show origin | sed -n '/HEAD branch/s/.*: //p'
+show_help() {
+    cat << EOF
+git-default-branch - Get the default branch for the repository
+
+Usage: git default-branch [options]
+
+Options:
+    --no-cache    Skip cache, query remote directly without updating cache
+    --refresh     Update cache with fresh remote query and return new value
+    -h, --help    Show this help message
+
+The default branch is cached in git config as 'branch.default' for faster
+subsequent lookups. Use --refresh to update the cache when the remote
+default branch changes.
+EOF
+}
+
+# Parse arguments
+USE_CACHE=true
+UPDATE_CACHE=false
+
+while [ $# -gt 0 ]; do
+    case $1 in
+        --no-cache)
+            USE_CACHE=false
+            shift
+            ;;
+        --refresh)
+            UPDATE_CACHE=true
+            shift
+            ;;
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            echo "Run 'git default-branch --help' for usage information" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Function to get default branch from remote
+get_remote_default_branch() {
+    git remote show origin 2>/dev/null | sed -n '/HEAD branch/s/.*: //p'
+}
+
+# Function to get cached default branch
+get_cached_default_branch() {
+    git config --get branch.default 2>/dev/null
+}
+
+# Function to cache default branch
+cache_default_branch() {
+    local branch="$1"
+    if [ -n "$branch" ]; then
+        git config branch.default "$branch"
+    fi
+}
+
+# Main logic
+if [ "$UPDATE_CACHE" = true ]; then
+    # Refresh cache: get from remote and update cache
+    DEFAULT_BRANCH=$(get_remote_default_branch)
+    if [ -n "$DEFAULT_BRANCH" ]; then
+        cache_default_branch "$DEFAULT_BRANCH"
+        echo "$DEFAULT_BRANCH"
+    else
+        echo "Error: Could not determine default branch from remote" >&2
+        exit 1
+    fi
+elif [ "$USE_CACHE" = true ]; then
+    # Try cache first, fall back to remote if not cached
+    DEFAULT_BRANCH=$(get_cached_default_branch)
+    if [ -n "$DEFAULT_BRANCH" ]; then
+        echo "$DEFAULT_BRANCH"
+    else
+        # Cache miss: get from remote and cache it
+        DEFAULT_BRANCH=$(get_remote_default_branch)
+        if [ -n "$DEFAULT_BRANCH" ]; then
+            cache_default_branch "$DEFAULT_BRANCH"
+            echo "$DEFAULT_BRANCH"
+        else
+            echo "Error: Could not determine default branch from remote" >&2
+            exit 1
+        fi
+    fi
+else
+    # No cache: just query remote directly
+    DEFAULT_BRANCH=$(get_remote_default_branch)
+    if [ -n "$DEFAULT_BRANCH" ]; then
+        echo "$DEFAULT_BRANCH"
+    else
+        echo "Error: Could not determine default branch from remote" >&2
+        exit 1
+    fi
+fi

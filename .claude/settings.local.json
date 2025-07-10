@@ -11,7 +11,10 @@
       "Bash(git commit:*)",
       "Bash(script/install:*)",
       "Bash(chmod:*)",
-      "Bash(./bin/edit-changed:*)"
+      "Bash(./bin/edit-changed:*)",
+      "Bash(./bin/git-default-branch --help)",
+      "Bash(./bin/git-default-branch)",
+      "Bash(./bin/git-default-branch --no-cache)"
     ],
     "deny": []
   }
