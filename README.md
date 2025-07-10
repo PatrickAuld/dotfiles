@@ -1,6 +1,6 @@
 # Patrick does dotfiles
 
-Your dotfiles are how you personalize your system. These are mine.
+Your dotfiles are how you personalize your system. These are mine for macOS.
 
 I was a little tired of having long alias files and everything strewn about
 (which is extremely common on other dotfiles projects, too). That led to this
@@ -69,8 +69,8 @@ environment fresh and up-to-date.
 
 ## bugs
 
-I want this to work for everyone; that means when you clone it down it should
-work for you even though you may not have `rbenv` installed, for example. That
+I want this to work for everyone on macOS; that means when you clone it down it should
+work for you even though you may not have certain tools installed. That
 said, I do use this as _my_ dotfiles, so there's a good chance I may break
 something if I forget to make a check for a dependency.
 

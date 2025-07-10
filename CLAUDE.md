@@ -1,6 +1,6 @@
 # CLAUDE.md - Development Context
 
-This is Patrick's personal dotfiles repository for macOS and Linux system configuration.
+This is Patrick's personal dotfiles repository for macOS system configuration.
 
 ## Repository Structure
 
@@ -23,7 +23,6 @@ Each directory represents a topic area (e.g., git, zsh, vim, etc.):
 - `hammerspoon/` - Hammerspoon automation (macOS)
 - `homebrew/` - Homebrew package management
 - `iterm2/` - iTerm2 terminal configuration
-- `linux/` - Linux-specific configurations
 - `macos/` - macOS system defaults
 - `npm/` - Node.js package manager
 - `nvm/` - Node Version Manager
@@ -31,7 +30,6 @@ Each directory represents a topic area (e.g., git, zsh, vim, etc.):
 - `starship/` - Shell prompt configuration
 - `system/` - System-wide configurations
 - `tar/` - Archive utilities
-- `terraform/` - Infrastructure as Code
 - `vim/` - Vim editor configuration
 - `yarn/` - Yarn package manager
 - `zsh/` - Z shell configuration
@@ -45,7 +43,6 @@ Each directory represents a topic area (e.g., git, zsh, vim, etc.):
 
 ### Package Management
 - **macOS**: Uses Homebrew via `Brewfile`
-- **Linux**: Uses apt via `Aptfile`
 
 ### Key Symlinked Files
 - `.gitconfig` - Git configuration
@@ -69,7 +66,7 @@ Each directory represents a topic area (e.g., git, zsh, vim, etc.):
 
 ### Common Tasks
 - **Add new tool**: Create topic directory with config files and install.sh
-- **Update packages**: Modify Brewfile (macOS) or Aptfile (Linux)
+- **Update packages**: Modify Brewfile
 - **Shell modifications**: Update relevant .zsh files
 - **Git workflow**: Standard git operations, commits include Claude attribution
 
@@ -88,7 +85,7 @@ Core packages installed via Homebrew:
 ### Installation Flow
 1. `script/bootstrap` - Sets up git config and symlinks
 2. macOS defaults via `macos/set-defaults.sh` (macOS only)
-3. Homebrew/apt package installation
+3. Homebrew package installation
 4. Topic-specific `install.sh` scripts execute
 5. Manual configuration as needed
 
