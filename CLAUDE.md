@@ -5,9 +5,8 @@ This is Patrick's personal dotfiles repository for macOS and Linux system config
 ## Repository Structure
 
 ### Key Scripts
-- `script/bootstrap` - Main setup script that symlinks dotfiles and installs dependencies
+- `script/bootstrap` - Main setup script that symlinks dotfiles, sets macOS defaults, and installs dependencies
 - `script/install` - Runs all topic-specific install.sh scripts
-- `bin/dot` - Legacy script referenced in bootstrap (may not exist)
 
 ### Topic-Based Organization
 Each directory represents a topic area (e.g., git, zsh, vim, etc.):
@@ -89,8 +88,9 @@ Core packages installed via Homebrew:
 
 ### Installation Flow
 1. `script/bootstrap` - Sets up git config and symlinks
-2. Homebrew/apt package installation
-3. Topic-specific `install.sh` scripts execute
-4. Manual configuration as needed
+2. macOS defaults via `macos/set-defaults.sh` (macOS only)
+3. Homebrew/apt package installation
+4. Topic-specific `install.sh` scripts execute
+5. Manual configuration as needed
 
 This is a mature dotfiles setup following holman's dotfiles philosophy with topic-based organization.
