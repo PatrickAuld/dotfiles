@@ -1,0 +1,188 @@
+#!/usr/bin/env bash
+set -e
+
+show_help() {
+    cat << EOF
+edit-changed - Open changed files in IDE or editor
+
+Usage: edit-changed [options]
+
+Opens files that have changed between the current branch and the default branch,
+plus any files with staged or unstaged changes. When run in VSCode or similar IDE
+terminals, opens files in the IDE. Otherwise uses \$EDITOR.
+
+Options:
+    -h, --help    Show this help message
+    -v, --verbose Show which files are being opened
+    -d, --dry-run Show files that would be opened without opening them
+
+Examples:
+    edit-changed              # Open all changed files
+    edit-changed --verbose    # Show files being opened
+    edit-changed --dry-run    # Preview files without opening
+
+Supported IDEs:
+    - VSCode (code command)
+    - Cursor (cursor command)
+EOF
+}
+
+# Parse arguments
+VERBOSE=false
+DRY_RUN=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        -v|--verbose)
+            VERBOSE=true
+            shift
+            ;;
+        -d|--dry-run)
+            DRY_RUN=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Run 'edit-changed --help' for usage information"
+            exit 1
+            ;;
+    esac
+done
+
+# Check if we're in a git repository
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "Error: Not in a git repository"
+    exit 1
+fi
+
+# Get the default branch using existing git-default-branch command
+DEFAULT_BRANCH=$(git-default-branch 2>/dev/null || echo "main")
+
+# Verify the branch exists locally
+if ! git show-ref --verify --quiet refs/heads/$DEFAULT_BRANCH; then
+    # Try to find a local branch if the remote default doesn't exist locally
+    if git show-ref --verify --quiet refs/heads/main; then
+        DEFAULT_BRANCH="main"
+    elif git show-ref --verify --quiet refs/heads/master; then
+        DEFAULT_BRANCH="master"
+    else
+        echo "Warning: Could not find default branch locally, using 'main'"
+        DEFAULT_BRANCH="main"
+    fi
+fi
+
+# Get changed files from different sources
+get_changed_files() {
+    local files=()
+    
+    # Files changed between current branch and default branch
+    if git show-ref --verify --quiet refs/heads/$DEFAULT_BRANCH; then
+        # Get files changed in commits ahead of default branch
+        local ahead_files=$(git diff --name-only $DEFAULT_BRANCH...HEAD 2>/dev/null || true)
+        if [[ -n "$ahead_files" ]]; then
+            files+=($ahead_files)
+        fi
+    fi
+    
+    # Files with staged changes
+    local staged_files=$(git diff --cached --name-only 2>/dev/null || true)
+    if [[ -n "$staged_files" ]]; then
+        files+=($staged_files)
+    fi
+    
+    # Files with unstaged changes
+    local unstaged_files=$(git diff --name-only 2>/dev/null || true)
+    if [[ -n "$unstaged_files" ]]; then
+        files+=($unstaged_files)
+    fi
+    
+    # Remove duplicates and filter existing files
+    printf '%s\n' "${files[@]}" | sort -u | while read -r file; do
+        if [[ -f "$file" ]]; then
+            echo "$file"
+        fi
+    done
+}
+
+# Detect IDE environment and choose appropriate command
+get_editor_command() {
+    # Check for IDE environment variables and commands
+    if [[ -n "$VSCODE_INJECTION" ]] || [[ "$TERM_PROGRAM" == "vscode" ]]; then
+        if command -v code >/dev/null 2>&1; then
+            echo "code"
+            return
+        fi
+    fi
+    
+    if [[ -n "$CURSOR_INJECTION" ]] || [[ "$TERM_PROGRAM" == "cursor" ]]; then
+        if command -v cursor >/dev/null 2>&1; then
+            echo "cursor"
+            return
+        fi
+    fi
+    
+    # Check for common IDE commands if no environment detected
+    if command -v code >/dev/null 2>&1; then
+        echo "code"
+        return
+    fi
+    
+    if command -v cursor >/dev/null 2>&1; then
+        echo "cursor"
+        return
+    fi
+    
+    # Fall back to $EDITOR
+    echo "${EDITOR:-vi}"
+}
+
+# Get the list of changed files
+files=($(get_changed_files))
+
+if [[ ${#files[@]} -eq 0 ]]; then
+    echo "No changed files found"
+    exit 0
+fi
+
+# Show files if verbose or dry run
+if [[ "$VERBOSE" == true ]] || [[ "$DRY_RUN" == true ]]; then
+    echo "Changed files:"
+    printf '  %s\n' "${files[@]}"
+    echo
+fi
+
+# Exit if dry run
+if [[ "$DRY_RUN" == true ]]; then
+    echo "Dry run - no files opened"
+    exit 0
+fi
+
+# Get the editor command
+EDITOR_CMD=$(get_editor_command)
+
+if [[ "$VERBOSE" == true ]]; then
+    echo "Using editor: $EDITOR_CMD"
+    echo "Opening ${#files[@]} files..."
+fi
+
+# Open the files
+if [[ "$EDITOR_CMD" == "code" ]] || [[ "$EDITOR_CMD" == "cursor" ]]; then
+    # IDE commands can handle multiple files
+    "$EDITOR_CMD" "${files[@]}"
+else
+    # Traditional editors - open one by one
+    for file in "${files[@]}"; do
+        if [[ "$VERBOSE" == true ]]; then
+            echo "Opening: $file"
+        fi
+        "$EDITOR_CMD" "$file"
+    done
+fi
+
+if [[ "$VERBOSE" == true ]]; then
+    echo "Done!"
+fi
