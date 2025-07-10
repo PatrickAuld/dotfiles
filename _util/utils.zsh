@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-__inNix(){
-  [[ -z ${IN_NIX_SHELL} ]]
-  return
-}
-
 __log(){
   readonly log_file=${log_file:-"/tmp/zsh-startup-$(date +%Y-%m-%d)"}
   echo $1 >> $log_file

@@ -25,7 +25,6 @@ Each directory represents a topic area (e.g., git, zsh, vim, etc.):
 - `iterm2/` - iTerm2 terminal configuration
 - `linux/` - Linux-specific configurations
 - `macos/` - macOS system defaults
-- `nix/` - Nix package manager
 - `npm/` - Node.js package manager
 - `nvm/` - Node Version Manager
 - `python/` - Python configuration
