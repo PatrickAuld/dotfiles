@@ -1,4 +1,37 @@
 #!/usr/bin/env bash
 set -e
 
+show_help() {
+    cat << EOF
+csvsql - Run SQL queries on CSV files
+
+Usage: csvsql <csv-file> <sql-query>
+
+Examples:
+    csvsql data.csv "SELECT * FROM data LIMIT 10"
+    csvsql sales.csv "SELECT name, SUM(amount) FROM data GROUP BY name"
+    csvsql users.csv "SELECT COUNT(*) FROM data WHERE age > 25"
+    csvsql products.csv "SELECT * FROM data WHERE price > 100 ORDER BY price DESC"
+
+Options:
+    -h, --help    Show this help message
+
+Note: The CSV data is imported into a table named 'data' in SQLite.
+EOF
+}
+
+# Check for help flags
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_help
+    exit 0
+fi
+
+# Check if we have the required arguments
+if [[ $# -lt 2 ]]; then
+    echo "Error: Missing arguments"
+    echo "Usage: csvsql <csv-file> <sql-query>"
+    echo "Run 'csvsql --help' for more information"
+    exit 1
+fi
+
 sqlite3 :memory: -cmd '.mode csv' -cmd ".import ${1} data" ${2}
