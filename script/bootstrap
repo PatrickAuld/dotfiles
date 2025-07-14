@@ -121,7 +121,15 @@ link_file () {
   if [ "$skip" != "true" ]  # "false" or empty
   then
     ln -s "$1" "$2"
-    success "linked $1 to $2"
+    
+    # Validate the symlink was created correctly
+    if [ -L "$2" ] && [ "$(readlink "$2")" = "$1" ]; then
+      # Set appropriate permissions (readable by owner)
+      chmod 644 "$2" 2>/dev/null || true
+      success "linked $1 to $2"
+    else
+      fail "failed to create symlink from $1 to $2"
+    fi
   fi
 }
 
