@@ -1,8 +1,4 @@
 cask_args appdir: '/Applications'
-
-tap 'homebrew/bundle'
-tap 'homebrew/cask'
-tap 'homebrew/core'
 brew 'diff-so-fancy'
 brew 'pkg-config'
 brew 'openssl'
