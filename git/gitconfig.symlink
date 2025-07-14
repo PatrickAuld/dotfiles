@@ -2,10 +2,6 @@
 [include]
   path = ~/.gitconfig.local
 
-[filter "media"]
-  required = true
-  clean = git media clean %f
-  smudge = git media smudge %f
 
 [alias]
   # Pretty prints the log with colors
