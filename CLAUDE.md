@@ -25,12 +25,13 @@ Each directory represents a topic area (e.g., git, zsh, vim, etc.):
 - `iterm2/` - iTerm2 terminal configuration
 - `macos/` - macOS system defaults
 - `npm/` - Node.js package manager
+- `nvim/` - Neovim configuration with LSP, TreeSitter, and plugins
 - `nvm/` - Node Version Manager
 - `python/` - Python configuration
 - `starship/` - Shell prompt configuration
 - `system/` - System-wide configurations
 - `tar/` - Archive utilities
-- `vim/` - Vim editor configuration
+- `vim/` - Minimal Vim configuration (use nvim for full features)
 - `yarn/` - Yarn package manager
 - `zsh/` - Z shell configuration
 
@@ -47,7 +48,8 @@ Each directory represents a topic area (e.g., git, zsh, vim, etc.):
 ### Key Symlinked Files
 - `.gitconfig` - Git configuration
 - `.gitignore` - Global git ignore
-- `.vimrc` - Vim configuration  
+- `.vimrc` - Minimal Vim configuration
+- `.config/nvim/init.lua` - Neovim configuration with plugins
 - `.zshrc` - Zsh configuration
 - `.npmrc` - NPM configuration
 - `.starship-config.toml` - Prompt configuration

@@ -1,1 +1,2 @@
-export EDITOR='vim'
+export EDITOR='nvim'
+export VISUAL='nvim'
