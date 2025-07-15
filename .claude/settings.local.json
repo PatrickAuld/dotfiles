@@ -6,16 +6,12 @@
       "Bash(ls:*)",
       "Bash(lua:*)",
       "Bash(mkdir:*)",
-      "Bash(git add:*)",
+      "Bash(git:*)",
       "Bash(rm:*)",
-      "Bash(git commit:*)",
       "Bash(script/install:*)",
       "Bash(chmod:*)",
-      "Bash(./bin/edit-changed:*)",
-      "Bash(./bin/git-default-branch --help)",
-      "Bash(./bin/git-default-branch)",
-      "Bash(./bin/git-default-branch --no-cache)",
-      "Bash(./bin/simplehist:*)"
+      "Bash(./bin/:*)",
+      "Bash(tree:*)",
     ],
     "deny": []
   }
