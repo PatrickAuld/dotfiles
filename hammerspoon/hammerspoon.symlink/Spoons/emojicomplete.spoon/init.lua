@@ -83,7 +83,7 @@ function obj:clearEmojiData()
     if res ~= 0 then
         hs.alert.show("Error deleting emoji data: " .. self.db:errmsg())
     else
-        hs.alert.show("Emoji data cleared from database.")
+        -- Emoji data cleared from database
     end
 end
 
@@ -109,7 +109,6 @@ function obj:loadEmojiDataFromJSON()
 
     -- If the version differs, reload all data
     if db_version ~= parsed_data.version then
-        hs.alert.show("Version mismatch! Reloading emoji data.")
 
         -- Clear existing data
         self:clearEmojiData()
@@ -130,9 +129,6 @@ function obj:loadEmojiDataFromJSON()
 
         -- Update the version in the database
         self:setDatabaseVersion(parsed_data.version)
-        hs.alert.show("Inserted " .. count .. " emojis into the database.")
-    else
-        hs.alert.show("Database version matches. Skipping reload.")
     end
 end
 
@@ -202,10 +198,12 @@ end
 
 -- Create a chooser UI for live emoji search
 function obj:showEmojiChooser()
+    local current = hs.application.frontmostApplication()
+    
     self.chooser = hs.chooser.new(function(selection)
         if selection then
-            hs.pasteboard.setContents(selection.emoji)
-            hs.alert.show("Copied to clipboard: " .. selection.emoji)
+            current:activate()
+            hs.eventtap.keyStrokes(selection.emoji)
 
             -- Update selection history for the chosen emoji
             self:updateSelectionHistory(selection.emoji)
