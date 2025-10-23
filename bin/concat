@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# This script reads a list of file paths, one per line, from standard input.
+# For each valid file, it prints an XML-style tag with the filename,
+# followed by the entire content of the file.
+
+# The script uses a 'while' loop to read lines from standard input (stdin).
+# The '-r' option prevents backslash escapes from being interpreted.
+# The 'IFS=' part ensures that leading/trailing whitespace on each line is preserved.
+while IFS= read -r file; do
+  # Check if the file exists and is a regular file.
+  if [ -f "$file" ]; then
+    # Print the opening and closing tags with the filename inside.
+    echo ""
+    echo "<FILE>$file</FILE>"
+    echo ""
+    # Use 'cat' to output the entire content of the file.
+    cat "$file"
+  else
+    # If the file does not exist, print a message to standard error (stderr).
+    # This keeps informational messages separate from the main output.
+    echo "Error: File not found: $file" >&2
+  fi
+done
