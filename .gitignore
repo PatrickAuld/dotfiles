@@ -8,6 +8,9 @@ hammerspoon/hammerspoon.symlink/EmojiComplete
 # Ignore the generated gitconfig
 git/gitconfig.local.symlink
 
+# The Emojicomplete db
+*.sqlite
+
 ### Vim template
 # swap
 [._]*.s[a-w][a-z]
