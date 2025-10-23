@@ -1,17 +1,13 @@
-atom.symlink/.apm
-atom.symlink/.node-gyp
-atom.symlink/.storage
-atom.symlink/blob-store
-atom.symlink/compile-cache/
-atom.symlink/packages
-atom.symlink/storage
-atom.symlink/themes
+# Ignore any local_* dir for company tools
+/local_*
 
 # Hammerspoon scripts that are installed
 hammerspoon/hammerspoon.symlink/anycomplete
 hammerspoon/hammerspoon.symlink/EmojiComplete
 
+# Ignore the generated gitconfig
 git/gitconfig.local.symlink
+
 ### Vim template
 # swap
 [._]*.s[a-w][a-z]
