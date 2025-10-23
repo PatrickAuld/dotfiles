@@ -1,5 +1,4 @@
-if [[ -z ~/.aws/credentials ]] then
-  echo "AWS Credentials File Not Found"
+if [ ! -f ~/.aws/credentials ]; then
   return 0
 fi
 
