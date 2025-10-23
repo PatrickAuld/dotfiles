@@ -13,23 +13,19 @@ a histogram with bars made of pipe characters (|). The output shows each
 unique value followed by its count and a visual bar representation.
 
 Options:
-    -h, --help    Show this help message
+    -h, --help      Show this help message
+    -s, --sort      Sort the output by count (highest first)
+    -r, --reverse   Sort the output by count (lowest first)
 
 Examples:
-    # Count occurrences of words in a file
-    cat words.txt | simplehist
+    # Count occurrences of words, sorted by most frequent
+    cat words.txt | simplehist -s
 
-    # Histogram of HTTP status codes from access logs
+    # Count file extensions, sorted by least frequent
+    ls -1 | grep -o '\.[^.]*\$' | simplehist -r
+
+    # Histogram of HTTP status codes from access logs (alphabetical)
     awk '{print \$9}' access.log | simplehist
-
-    # Count file extensions in current directory
-    ls -1 | grep -o '\.[^.]*\$' | simplehist
-
-    # Histogram of shell commands from history
-    history | awk '{print \$2}' | simplehist
-
-    # Count unique values from a column of data
-    cut -d, -f2 data.csv | simplehist
 
 Output format:
     Each line shows: value count |||||||||
@@ -37,17 +33,41 @@ Output format:
 EOF
 }
 
-# Check for help flags
-if [[ "$1" == "-h" || "$1" == "--help" ]]; then
-    show_help
-    exit 0
-fi
+# --- Main Script Logic ---
 
-# Check for any other arguments (which would be invalid)
-if [[ $# -gt 0 ]]; then
-    echo "Error: Unknown argument '$1'"
-    echo "Run 'simplehist --help' for usage information"
-    exit 1
-fi
+# Default sort command is 'cat' which preserves the initial alphabetical sort
+sort_command="cat"
 
-sort | uniq -c | awk '{print $2" "$1}' | perl -pe 's/(\d+)$/"|"x$1/e'
+# Parse command-line options
+while [[ $# -gt 0 ]]; do
+    key="$1"
+    case $key in
+        -h|--help)
+        show_help
+        exit 0
+        ;;
+        -s|--sort)
+        # Sort numerically in reverse order (highest first)
+        sort_command="sort -nr"
+        shift # past argument
+        ;;
+        -r|--reverse)
+        # Sort numerically in standard order (lowest first)
+        sort_command="sort -n"
+        shift # past argument
+        ;;
+        *)    # unknown option
+        echo "Error: Unknown argument '$1'"
+        echo "Run 'simplehist --help' for usage information"
+        exit 1
+        ;;
+    esac
+done
+
+# The processing pipeline.
+# 1. `sort`: Sorts input alphabetically so `uniq` can work.
+# 2. `uniq -c`: Counts occurrences, outputting 'count value'.
+# 3. `$sort_command`: Applies the user-selected sort order (or `cat` for none).
+# 4. `awk`: Swaps columns to 'value count'.
+# 5. `perl`: Replaces the count with a pipe bar representation.
+sort | uniq -c | $sort_command | awk '{print $2" "$1}' | perl -pe 's/(\d+)$/"|"x$1/e'
