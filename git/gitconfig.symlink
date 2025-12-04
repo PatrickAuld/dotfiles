@@ -53,6 +53,9 @@
   # switch the main/master branch
   sm = !git default-branch | xargs git switch
 
+  # Pull latest using stash for local changes
+  spp = !git stash save -u && git pull && git stash pop
+
 [color]
   diff = auto
   status = auto
@@ -61,7 +64,7 @@
 
 [core]
   excludesfile = ~/.gitignore
-	editor = vim
+	editor = nvim
 	fsmonitor = true
 	untrackedcache = true
 
@@ -93,11 +96,9 @@
   #
   # Setting to git 2.0 default to suppress warning message
   default = simple
-	helper = osxkeychain
 
 [user]
 	name = Patrick Auld
-	email = patrick@patrickauld.com
 
 [filter "lfs"]
 	clean = git-lfs clean -- %f
