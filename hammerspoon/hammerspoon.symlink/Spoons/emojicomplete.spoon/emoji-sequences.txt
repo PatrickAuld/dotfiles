@@ -1,43 +1,3 @@
-# emoji-sequences.txt
-# Date: 2024-05-01, 21:25:24 GMT
-# © 2024 Unicode®, Inc.
-# Unicode and the Unicode Logo are registered trademarks of Unicode, Inc. in the U.S. and other countries.
-# For terms of use and license, see https://www.unicode.org/terms_of_use.html
-#
-# Emoji Sequence Data for UTS #51
-# Version: 16.0
-#
-# For documentation and usage, see https://www.unicode.org/reports/tr51
-#
-# Format:
-#   code_point(s) ; type_field ; description # comments
-# Fields:
-#   code_point(s): one or more code points in hex format, separated by spaces
-#   type_field, one of the following:
-#       Basic_Emoji
-#       Emoji_Keycap_Sequence
-#       RGI_Emoji_Flag_Sequence
-#       RGI_Emoji_Tag_Sequence
-#       RGI_Emoji_Modifier_Sequence
-#     The type_field is a convenience for parsing the emoji sequence files, and is not intended to be maintained as a property.
-#   short name: CLDR short name of sequence; characters may be escaped with \x{hex}.
-#
-# For the purpose of regular expressions, each of the type fields defines the name of
-# a binary property of strings. The short name of each property is the same as the long name.
-#
-# For the purpose of regular expressions, the property RGI_Emoji is defined as
-# a binary property of strings corresponding to ED-27 in UTS #51 Unicode Emoji.
-# That is, it is the union of the above properties plus RGI_Emoji_ZWJ_Sequence,
-# whose data is in emoji-zwj-sequences.txt.
-# The short name of RGI_Emoji is the same as the long name.
-#
-# Characters and sequences are listed in code point order. Users should be shown a more natural order.
-# See the CLDR collation order for Emoji.
-
-# ================================================
-
-# Basic_Emoji
-
 231A..231B    ; Basic_Emoji                  ; watch..hourglass done                                          # E0.6   [2] (⌚..⌛)
 23E9..23EC    ; Basic_Emoji                  ; fast-forward button..fast down button                          # E0.6   [4] (⏩..⏬)
 23F0          ; Basic_Emoji                  ; alarm clock                                                    # E0.6   [1] (⏰)
@@ -238,6 +198,7 @@
 1F6D1..1F6D2  ; Basic_Emoji                  ; stop sign..shopping cart                                       # E3.0   [2] (🛑..🛒)
 1F6D5         ; Basic_Emoji                  ; hindu temple                                                   # E12.0  [1] (🛕)
 1F6D6..1F6D7  ; Basic_Emoji                  ; hut..elevator                                                  # E13.0  [2] (🛖..🛗)
+1F6D8         ; Basic_Emoji                  ; landslide                                                      # E17.0  [1] (🛘)
 1F6DC         ; Basic_Emoji                  ; wireless                                                       # E15.0  [1] (🛜)
 1F6DD..1F6DF  ; Basic_Emoji                  ; playground slide..ring buoy                                    # E14.0  [3] (🛝..🛟)
 1F6EB..1F6EC  ; Basic_Emoji                  ; airplane departure..airplane arrival                           # E1.0   [2] (🛫..🛬)
@@ -302,6 +263,8 @@
 1FA83..1FA86  ; Basic_Emoji                  ; boomerang..nesting dolls                                       # E13.0  [4] (🪃..🪆)
 1FA87..1FA88  ; Basic_Emoji                  ; maracas..flute                                                 # E15.0  [2] (🪇..🪈)
 1FA89         ; Basic_Emoji                  ; harp                                                           # E16.0  [1] (🪉)
+1FA8A         ; Basic_Emoji                  ; trombone                                                       # E17.0  [1] (🪊)
+1FA8E         ; Basic_Emoji                  ; treasure chest                                                 # E17.0  [1] (🪎)
 1FA8F         ; Basic_Emoji                  ; shovel                                                         # E16.0  [1] (🪏)
 1FA90..1FA95  ; Basic_Emoji                  ; ringed planet..banjo                                           # E12.0  [6] (🪐..🪕)
 1FA96..1FAA8  ; Basic_Emoji                  ; military helmet..rock                                          # E13.0 [19] (🪖..🪨)
@@ -315,6 +278,8 @@
 1FAC0..1FAC2  ; Basic_Emoji                  ; anatomical heart..people hugging                               # E13.0  [3] (🫀..🫂)
 1FAC3..1FAC5  ; Basic_Emoji                  ; pregnant man..person with crown                                # E14.0  [3] (🫃..🫅)
 1FAC6         ; Basic_Emoji                  ; fingerprint                                                    # E16.0  [1] (🫆)
+1FAC8         ; Basic_Emoji                  ; hairy creature                                                 # E17.0  [1] (🫈)
+1FACD         ; Basic_Emoji                  ; orca                                                           # E17.0  [1] (🫍)
 1FACE..1FACF  ; Basic_Emoji                  ; moose..donkey                                                  # E15.0  [2] (🫎..🫏)
 1FAD0..1FAD6  ; Basic_Emoji                  ; blueberries..teapot                                            # E13.0  [7] (🫐..🫖)
 1FAD7..1FAD9  ; Basic_Emoji                  ; pouring liquid..jar                                            # E14.0  [3] (🫗..🫙)
@@ -324,6 +289,8 @@
 1FAE0..1FAE7  ; Basic_Emoji                  ; melting face..bubbles                                          # E14.0  [8] (🫠..🫧)
 1FAE8         ; Basic_Emoji                  ; shaking face                                                   # E15.0  [1] (🫨)
 1FAE9         ; Basic_Emoji                  ; face with bags under eyes                                      # E16.0  [1] (🫩)
+1FAEA         ; Basic_Emoji                  ; distorted face                                                 # E17.0  [1] (🫪)
+1FAEF         ; Basic_Emoji                  ; fight cloud                                                    # E17.0  [1] (🫯)
 1FAF0..1FAF6  ; Basic_Emoji                  ; hand with index finger and thumb crossed..heart hands          # E14.0  [7] (🫰..🫶)
 1FAF7..1FAF8  ; Basic_Emoji                  ; leftwards pushing hand..rightwards pushing hand                # E15.0  [2] (🫷..🫸)
 00A9 FE0F     ; Basic_Emoji                  ; copyright                                                      # E0.6   [1] (©️)
@@ -534,7 +501,7 @@
 1F6F0 FE0F    ; Basic_Emoji                  ; satellite                                                      # E0.7   [1] (🛰️)
 1F6F3 FE0F    ; Basic_Emoji                  ; passenger ship                                                 # E0.7   [1] (🛳️)
 
-# Total elements: 1393
+# Total elements: 1400
 
 # ================================================
 
@@ -1011,6 +978,11 @@
 1F46E 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; police officer: medium skin tone                               # E1.0   [1] (👮🏽)
 1F46E 1F3FE   ; RGI_Emoji_Modifier_Sequence  ; police officer: medium-dark skin tone                          # E1.0   [1] (👮🏾)
 1F46E 1F3FF   ; RGI_Emoji_Modifier_Sequence  ; police officer: dark skin tone                                 # E1.0   [1] (👮🏿)
+1F46F 1F3FB   ; RGI_Emoji_Modifier_Sequence  ; people with bunny ears: light skin tone                        # E17.0  [1] (👯🏻)
+1F46F 1F3FC   ; RGI_Emoji_Modifier_Sequence  ; people with bunny ears: medium-light skin tone                 # E17.0  [1] (👯🏼)
+1F46F 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; people with bunny ears: medium skin tone                       # E17.0  [1] (👯🏽)
+1F46F 1F3FE   ; RGI_Emoji_Modifier_Sequence  ; people with bunny ears: medium-dark skin tone                  # E17.0  [1] (👯🏾)
+1F46F 1F3FF   ; RGI_Emoji_Modifier_Sequence  ; people with bunny ears: dark skin tone                         # E17.0  [1] (👯🏿)
 1F470 1F3FB   ; RGI_Emoji_Modifier_Sequence  ; person with veil: light skin tone                              # E1.0   [1] (👰🏻)
 1F470 1F3FC   ; RGI_Emoji_Modifier_Sequence  ; person with veil: medium-light skin tone                       # E1.0   [1] (👰🏼)
 1F470 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; person with veil: medium skin tone                             # E1.0   [1] (👰🏽)
@@ -1311,6 +1283,11 @@
 1F939 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; person juggling: medium skin tone                              # E3.0   [1] (🤹🏽)
 1F939 1F3FE   ; RGI_Emoji_Modifier_Sequence  ; person juggling: medium-dark skin tone                         # E3.0   [1] (🤹🏾)
 1F939 1F3FF   ; RGI_Emoji_Modifier_Sequence  ; person juggling: dark skin tone                                # E3.0   [1] (🤹🏿)
+1F93C 1F3FB   ; RGI_Emoji_Modifier_Sequence  ; people wrestling: light skin tone                              # E17.0  [1] (🤼🏻)
+1F93C 1F3FC   ; RGI_Emoji_Modifier_Sequence  ; people wrestling: medium-light skin tone                       # E17.0  [1] (🤼🏼)
+1F93C 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; people wrestling: medium skin tone                             # E17.0  [1] (🤼🏽)
+1F93C 1F3FE   ; RGI_Emoji_Modifier_Sequence  ; people wrestling: medium-dark skin tone                        # E17.0  [1] (🤼🏾)
+1F93C 1F3FF   ; RGI_Emoji_Modifier_Sequence  ; people wrestling: dark skin tone                               # E17.0  [1] (🤼🏿)
 1F93D 1F3FB   ; RGI_Emoji_Modifier_Sequence  ; person playing water polo: light skin tone                     # E3.0   [1] (🤽🏻)
 1F93D 1F3FC   ; RGI_Emoji_Modifier_Sequence  ; person playing water polo: medium-light skin tone              # E3.0   [1] (🤽🏼)
 1F93D 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; person playing water polo: medium skin tone                    # E3.0   [1] (🤽🏽)
@@ -1492,6 +1469,6 @@
 1FAF8 1F3FE   ; RGI_Emoji_Modifier_Sequence  ; rightwards pushing hand: medium-dark skin tone                 # E15.0  [1] (🫸🏾)
 1FAF8 1F3FF   ; RGI_Emoji_Modifier_Sequence  ; rightwards pushing hand: dark skin tone                        # E15.0  [1] (🫸🏿)
 
-# Total elements: 655
+# Total elements: 665
 
 #EOF
