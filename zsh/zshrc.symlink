@@ -51,3 +51,5 @@ done
 unset config_files
 
 __log "Shell loaded."
+
+export PATH="$HOME/.local/bin:$PATH"
