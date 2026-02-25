@@ -1,6 +1,9 @@
 # Shared tools
 export PATH="$ZSH/bin:/usr/local/bin:$PATH"
 
+# User-local binaries (especially important on Linux where /usr/local/bin may require sudo)
+export PATH="$HOME/.local/bin:$PATH"
+
 # OS-specific tools
 case "$(uname -s)" in
   Darwin)

@@ -31,5 +31,6 @@ fi
 # Fallback: official installer script
 if ! command -v starship >/dev/null 2>&1; then
   echo "› Installing starship via installer script" >&2
-  curl -fsSL https://starship.rs/install.sh | sh -s -- -y
+  mkdir -p "$HOME/.local/bin"
+  curl -fsSL https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin"
 fi
