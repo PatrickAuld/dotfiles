@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 #
 # Run all dotfiles installers.
+#
+# Each subdirectory is responsible for detecting the current OS and either
+# installing what it can or gracefully skipping.
 
 set -euo pipefail
 
@@ -10,28 +13,7 @@ DOTFILES_ROOT=$(pwd -P)
 # shellcheck source=script/util.sh
 source "$DOTFILES_ROOT/script/util.sh"
 
-if is_darwin; then
-  echo "› brew bundle"
-  brew bundle
-
-  find . -name install.sh | while read -r installer; do
-    "$installer"
-  done
-
-elif is_linux; then
-  if [ -x linux/install.sh ]; then
-    linux/install.sh
-  fi
-
-  # run installers excluding known macOS-only folders (they are guarded too)
-  find . -name install.sh \
-    ! -path "./macos/*" \
-    ! -path "./homebrew/*" \
-    ! -path "./hammerspoon/*" \
-    | while read -r installer; do
-      "$installer"
-    done
-else
-  echo "Unsupported OS: $(uname -s)" >&2
-  exit 1
-fi
+# Run every installer; OS-specific installers should call require_darwin/require_linux.
+find . -name install.sh | while read -r installer; do
+  "$installer"
+done
