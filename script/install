@@ -2,13 +2,36 @@
 #
 # Run all dotfiles installers.
 
-set -e
+set -euo pipefail
 
-cd "$(dirname $0)"/..
+cd "$(dirname "$0")/.."
+DOTFILES_ROOT=$(pwd -P)
 
-# Run Homebrew through the Brewfile
-echo "› brew bundle"
-brew bundle
+# shellcheck source=script/util.sh
+source "$DOTFILES_ROOT/script/util.sh"
 
-# find the installers and run them iteratively
-find . -name install.sh | while read installer ; do sh -c "${installer}" ; done
+if is_darwin; then
+  echo "› brew bundle"
+  brew bundle
+
+  find . -name install.sh | while read -r installer; do
+    "$installer"
+  done
+
+elif is_linux; then
+  if [ -x linux/install.sh ]; then
+    linux/install.sh
+  fi
+
+  # run installers excluding known macOS-only folders (they are guarded too)
+  find . -name install.sh \
+    ! -path "./macos/*" \
+    ! -path "./homebrew/*" \
+    ! -path "./hammerspoon/*" \
+    | while read -r installer; do
+      "$installer"
+    done
+else
+  echo "Unsupported OS: $(uname -s)" >&2
+  exit 1
+fi
