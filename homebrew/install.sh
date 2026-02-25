@@ -21,6 +21,6 @@ fi
 
 # Install Brewfile packages
 echo "  › brew bundle"
-( cd "" && brew bundle )
+( cd "$DOTFILES_ROOT" && brew bundle )
 
 exit 0
