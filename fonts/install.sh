@@ -37,6 +37,15 @@ if is_linux; then
   tmp_dir=$(mktemp -d)
   trap 'rm -rf "$tmp_dir"' EXIT
 
+  if ! command -v curl >/dev/null 2>&1; then
+    echo "curl is required to download fonts; skipping." >&2
+    exit 0
+  fi
+  if ! command -v unzip >/dev/null 2>&1; then
+    echo "unzip is required to install fonts; skipping." >&2
+    exit 0
+  fi
+
   # Source Code Pro
   # Release page referenced in this repo:
   # https://github.com/adobe-fonts/source-code-pro/releases/tag/2.030R-ro%2F1.050R-it
