@@ -11,10 +11,20 @@ require_linux
 # Linux (Ubuntu/Debian): install via apt-get when available.
 # Ensure curl exists for the fallback installer.
 if command -v apt-get >/dev/null 2>&1; then
-  sudo apt-get update
-  sudo apt-get install -y curl
-  if sudo apt-get install -y starship; then
-    exit 0
+  if command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+    sudo apt-get update
+    sudo apt-get install -y curl
+    if sudo apt-get install -y starship; then
+      exit 0
+    fi
+  elif [ "$(id -u)" -eq 0 ]; then
+    apt-get update
+    apt-get install -y curl
+    if apt-get install -y starship; then
+      exit 0
+    fi
+  else
+    echo "sudo is required to install starship via apt-get; will use fallback if possible." >&2
   fi
 fi
 
