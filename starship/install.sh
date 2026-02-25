@@ -9,7 +9,10 @@ source "$DOTFILES_ROOT/script/util.sh"
 require_linux
 
 # Linux (Ubuntu/Debian): install via apt-get when available.
+# Ensure curl exists for the fallback installer.
 if command -v apt-get >/dev/null 2>&1; then
+  sudo apt-get update
+  sudo apt-get install -y curl
   if sudo apt-get install -y starship; then
     exit 0
   fi
