@@ -4,10 +4,10 @@ export PATH="$ZSH/bin:/usr/local/bin:$PATH"
 # OS-specific tools
 case "$(uname -s)" in
   Darwin)
-    export PATH="$ZSH/darwin_bin:$PATH"
+    export PATH="$ZSH/bin_darwin:$PATH"
     ;;
   Linux)
-    export PATH="$ZSH/linux_bin:$PATH"
+    export PATH="$ZSH/bin_linux:$PATH"
     ;;
 esac
 
