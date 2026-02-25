@@ -1,15 +1,20 @@
-#!/bin/sh
-#
-# Homebrew
-#
-# This installs some of the common dependencies needed (or at least desired)
-# using Homebrew.
+#!/usr/bin/env bash
 
-# Check for Homebrew
-if test ! $(which brew)
-then
+set -euo pipefail
+
+DOTFILES_ROOT="$(cd "$(dirname "$0")/.." && pwd -P)"
+# shellcheck source=script/util.sh
+source "$DOTFILES_ROOT/script/util.sh"
+require_darwin
+
+# Homebrew
+# This installs Homebrew (if missing) and then installs packages via Brewfile.
+
+if ! command -v brew >/dev/null 2>&1; then
   echo "  Installing Homebrew for you."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-exit 0
+# Install Brewfile packages
+echo "  › brew bundle"
+( cd "$DOTFILES_ROOT" && brew bundle )
