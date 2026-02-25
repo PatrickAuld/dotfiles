@@ -10,18 +10,46 @@ if is_linux; then
   # Linux (Ubuntu/Debian): install via apt-get when available.
   if command -v apt-get >/dev/null 2>&1; then
     sudo apt-get update
-    # A solid baseline for terminals/editors.
     sudo apt-get install -y \
       fontconfig \
-      fonts-firacode
-
-    # Refresh font cache
-    fc-cache -f || true
-
-    exit 0
+      curl \
+      unzip
   fi
 
-  echo "apt-get not found; please install fonts manually." >&2
+  echo "› Linux: installing Source Code Pro + Source Code Pro Nerd Font"
+
+  install_dir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
+  src_dir="$install_dir/source-code-pro"
+  nerd_dir="$install_dir/nerd-fonts"
+
+  mkdir -p "$src_dir" "$nerd_dir"
+
+  tmp_dir=$(mktemp -d)
+  trap 'rm -rf "$tmp_dir"' EXIT
+
+  # Source Code Pro
+  # Release page referenced in this repo:
+  # https://github.com/adobe-fonts/source-code-pro/releases/tag/2.030R-ro%2F1.050R-it
+  src_url="https://github.com/adobe-fonts/source-code-pro/releases/download/2.030R-ro%2F1.050R-it/source-code-pro-2.030R-ro-1.050R-it.zip"
+  src_zip="$tmp_dir/source-code-pro.zip"
+  curl -fsSL "$src_url" -o "$src_zip"
+  unzip -q -o "$src_zip" -d "$tmp_dir/source-code-pro"
+  find "$tmp_dir/source-code-pro" -type f \( -iname '*.otf' -o -iname '*.ttf' \) -print0 \
+    | xargs -0 -I{} cp -f "{}" "$src_dir/"
+
+  # Source Code Pro Nerd Font
+  nerd_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/SourceCodePro.zip"
+  nerd_zip="$tmp_dir/SourceCodePro-nerd.zip"
+  curl -fsSL "$nerd_url" -o "$nerd_zip"
+  unzip -q -o "$nerd_zip" -d "$tmp_dir/nerd"
+  find "$tmp_dir/nerd" -type f \( -iname '*.otf' -o -iname '*.ttf' \) -print0 \
+    | xargs -0 -I{} cp -f "{}" "$nerd_dir/"
+
+  # Refresh font cache
+  if command -v fc-cache >/dev/null 2>&1; then
+    fc-cache -f || true
+  fi
+
   exit 0
 fi
 
