@@ -9,21 +9,11 @@ source "$DOTFILES_ROOT/script/util.sh"
 if is_linux; then
   # Linux (Ubuntu/Debian): install via apt-get when available.
   if command -v apt-get >/dev/null 2>&1; then
-    if command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
-      sudo apt-get update
-      sudo apt-get install -y \
-        fontconfig \
-        curl \
-        unzip
-    elif [ "$(id -u)" -eq 0 ]; then
-      apt-get update
-      apt-get install -y \
-        fontconfig \
-        curl \
-        unzip
-    else
-      echo "sudo is required to install font dependencies; continuing (may fail if curl/unzip missing)." >&2
-    fi
+    sudo apt-get update
+    sudo apt-get install -y \
+      fontconfig \
+      curl \
+      unzip
   fi
 
   echo "› Linux: installing Source Code Pro + Source Code Pro Nerd Font"
