@@ -1,14 +1,19 @@
 #!/usr/bin/env bash
 #
 # Run all dotfiles installers.
+#
+# Each subdirectory is responsible for detecting the current OS and either
+# installing what it can or gracefully skipping.
 
-set -e
+set -euo pipefail
 
-cd "$(dirname $0)"/..
+cd "$(dirname "$0")/.."
+DOTFILES_ROOT=$(pwd -P)
 
-# Run Homebrew through the Brewfile
-echo "› brew bundle"
-brew bundle
+# shellcheck source=script/util.sh
+source "$DOTFILES_ROOT/script/util.sh"
 
-# find the installers and run them iteratively
-find . -name install.sh | while read installer ; do sh -c "${installer}" ; done
+# Run every installer; OS-specific installers should call require_darwin/require_linux.
+find . -name install.sh | while read -r installer; do
+  "$installer"
+done
