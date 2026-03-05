@@ -28,9 +28,6 @@
   # Stage all changes that are more than just whitespace
   addiws = !git add-ignore-whitespace
 
-  # Ranks all authors by size of diffs
-  rank-contributors = !$ZSH/bin/git-rank-contributors
-
   # Quick insight of Stash
   s = !git status --short --branch
 
@@ -39,9 +36,6 @@
 
   # Deletes all branches that have been merged into `master` or `main`
   delete-merged-branches = !git branch --merged | egrep -v '(^\\*|master|main)' | xargs git branch -d
-
-  # switch the main/master branch
-  sm = !git default-branch | xargs git switch
 
   # Pull latest using stash for local changes
   spp = !git stash save -u && git pull && git stash pop
