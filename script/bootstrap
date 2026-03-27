@@ -164,7 +164,7 @@ install_dotfiles () {
 setup_gitconfig
 install_dotfiles
 
-# If we're on a Mac, let's install and setup homebrew.
+# OS-specific setup
 if [ "$(uname -s)" == "Darwin" ]
 then
   info "setting macOS defaults"
@@ -174,14 +174,14 @@ then
   else
     fail "error setting macOS defaults"
   fi
-  
-  info "installing dependencies"
-  if script/install | while read -r data; do info "$data"; done
-  then
-    success "dependencies installed"
-  else
-    fail "error installing dependencies"
-  fi
+fi
+
+info "installing dependencies"
+if script/install | while read -r data; do info "$data"; done
+then
+  success "dependencies installed"
+else
+  fail "error installing dependencies"
 fi
 
 echo ''
