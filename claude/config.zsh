@@ -1,1 +1,1 @@
-export PATH=".claude/local/claude:${PATH}"
+export PATH="~/.local/bin:${PATH}"
