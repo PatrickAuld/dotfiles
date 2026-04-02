@@ -2,10 +2,43 @@
 #
 # bootstrap installs things.
 
+set -euo pipefail
+
 cd "$(dirname "$0")/.."
 DOTFILES_ROOT=$(pwd -P)
 
-set -e
+GIT_AUTHOR_NAME_ARG=""
+GIT_AUTHOR_EMAIL_ARG=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --git-name)
+      GIT_AUTHOR_NAME_ARG=${2:-}
+      shift 2
+      ;;
+    --git-email)
+      GIT_AUTHOR_EMAIL_ARG=${2:-}
+      shift 2
+      ;;
+    --help|-h)
+      cat <<'EOF'
+Usage: script/bootstrap [--git-name NAME] [--git-email EMAIL]
+
+Options:
+  --git-name NAME    Git author/user name for gitconfig.local
+  --git-email EMAIL  Git author email for gitconfig.local
+
+For unattended bootstrap, provide both --git-name and --git-email
+(or equivalent env vars) so gitconfig.local can be generated without prompts.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+done
 
 echo ''
 
@@ -38,25 +71,23 @@ setup_gitconfig () {
       git_credential='osxkeychain'
     fi
 
-    # Non-interactive sessions (CI, scripts) should not prompt.
-    # Provide values via env if desired:
-    #   DOTFILES_GIT_AUTHORNAME / DOTFILES_GIT_AUTHOREMAIL
-    # or standard git env:
-    #   GIT_AUTHOR_NAME / GIT_AUTHOR_EMAIL
-    if [ ! -t 0 ] || [ ! -t 1 ]; then
-      git_authorname=${DOTFILES_GIT_AUTHORNAME:-${GIT_AUTHOR_NAME:-""}}
-      git_authoremail=${DOTFILES_GIT_AUTHOREMAIL:-${GIT_AUTHOR_EMAIL:-""}}
+    git_authorname=${GIT_AUTHOR_NAME_ARG:-${DOTFILES_GIT_AUTHORNAME:-${GIT_AUTHOR_NAME:-""}}}
+    git_authoremail=${GIT_AUTHOR_EMAIL_ARG:-${DOTFILES_GIT_AUTHOREMAIL:-${GIT_AUTHOR_EMAIL:-""}}}
 
+    # Non-interactive sessions (CI, scripts) must not prompt; require explicit identity.
+    if [ ! -t 0 ] || [ ! -t 1 ]; then
       if [ -z "$git_authorname" ] || [ -z "$git_authoremail" ]; then
-        user " - Non-interactive shell detected; skipping gitconfig.local setup."
-        user "   Set DOTFILES_GIT_AUTHORNAME and DOTFILES_GIT_AUTHOREMAIL to enable." 
-        return 0
+        fail "non-interactive bootstrap requires --git-name and --git-email (or DOTFILES_GIT_AUTHORNAME / DOTFILES_GIT_AUTHOREMAIL)"
       fi
     else
-      user ' - What is your github author name?'
-      read -e git_authorname
-      user ' - What is your github author email?'
-      read -e git_authoremail
+      if [ -z "$git_authorname" ]; then
+        user ' - What is your github author name?'
+        read -r -e git_authorname
+      fi
+      if [ -z "$git_authoremail" ]; then
+        user ' - What is your github author email?'
+        read -r -e git_authoremail
+      fi
     fi
 
     sed -e "s/AUTHORNAME/$git_authorname/g" -e "s/AUTHOREMAIL/$git_authoremail/g" -e "s/GIT_CREDENTIAL_HELPER/$git_credential/g" git/gitconfig.local.symlink.example > git/gitconfig.local.symlink

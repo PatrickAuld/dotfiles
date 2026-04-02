@@ -13,8 +13,13 @@ require_linux
 if command -v apt-get >/dev/null 2>&1; then
   sudo apt-get update
   sudo apt-get install -y curl
-  if sudo apt-get install -y starship; then
-    exit 0
+
+  if apt-cache show starship >/dev/null 2>&1; then
+    if sudo apt-get install -y starship; then
+      exit 0
+    fi
+  else
+    echo "› starship package not available via apt; falling back to installer script" >&2
   fi
 fi
 
@@ -22,4 +27,9 @@ fi
 if ! command -v starship >/dev/null 2>&1; then
   echo "› Installing starship via installer script" >&2
   curl -fsSL https://starship.rs/install.sh | sudo sh -s -- -y
+fi
+
+if ! command -v starship >/dev/null 2>&1; then
+  echo "starship installation failed" >&2
+  exit 1
 fi

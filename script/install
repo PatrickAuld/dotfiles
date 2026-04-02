@@ -13,7 +13,11 @@ DOTFILES_ROOT=$(pwd -P)
 # shellcheck source=script/util.sh
 source "$DOTFILES_ROOT/script/util.sh"
 
-# Run every installer; OS-specific installers should call require_darwin/require_linux.
-find . -name install.sh | while read -r installer; do
+# Run every installer from the repository tree only; avoid traversing into
+# embedded git data and any *.symlink directories that may point outside the
+# repo or into permission-restricted trees.
+find "$DOTFILES_ROOT" \
+  \( -path "$DOTFILES_ROOT/.git" -o -name '*.symlink' \) -prune -o \
+  -type f -name install.sh -print | while read -r installer; do
   "$installer"
 done

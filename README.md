@@ -56,6 +56,20 @@ cd ~/.dotfiles
 script/bootstrap
 ```
 
+For unattended bootstrap, pass the Git identity explicitly:
+
+```sh
+script/bootstrap --git-name "Your Name" --git-email "you@example.com"
+```
+
+You can also provide the same values through environment variables:
+
+```sh
+DOTFILES_GIT_AUTHORNAME="Your Name" \
+DOTFILES_GIT_AUTHOREMAIL="you@example.com" \
+script/bootstrap
+```
+
 This will symlink the appropriate files in `.dotfiles` to your home directory.
 Everything is configured and tweaked within `~/.dotfiles`.
 
