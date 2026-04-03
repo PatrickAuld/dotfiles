@@ -9,6 +9,7 @@ DOTFILES_ROOT=$(pwd -P)
 
 GIT_AUTHOR_NAME_ARG=""
 GIT_AUTHOR_EMAIL_ARG=""
+CONFLICT_POLICY_ARG=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -20,16 +21,22 @@ while [[ $# -gt 0 ]]; do
       GIT_AUTHOR_EMAIL_ARG=${2:-}
       shift 2
       ;;
+    --conflict)
+      CONFLICT_POLICY_ARG=${2:-}
+      shift 2
+      ;;
     --help|-h)
       cat <<'EOF'
-Usage: script/bootstrap [--git-name NAME] [--git-email EMAIL]
+Usage: script/bootstrap [--git-name NAME] [--git-email EMAIL] [--conflict POLICY]
 
 Options:
-  --git-name NAME    Git author/user name for gitconfig.local
-  --git-email EMAIL  Git author email for gitconfig.local
+  --git-name NAME       Git author/user name for gitconfig.local
+  --git-email EMAIL     Git author email for gitconfig.local
+  --conflict POLICY     Conflict policy for existing files: skip|overwrite|backup
 
 For unattended bootstrap, provide both --git-name and --git-email
 (or equivalent env vars) so gitconfig.local can be generated without prompts.
+In non-interactive mode, file conflicts default to: skip.
 EOF
       exit 0
       ;;
@@ -109,7 +116,7 @@ link_file () {
     if [ "$overwrite_all" == "false" ] && [ "$backup_all" == "false" ] && [ "$skip_all" == "false" ]
     then
 
-      local currentSrc="$(readlink $dst)"
+      local currentSrc="$(readlink "$dst" 2>/dev/null || true)"
 
       if [ "$currentSrc" == "$src" ]
       then
@@ -118,26 +125,30 @@ link_file () {
 
       else
 
-        user "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
+        if [ ! -t 0 ] || [ ! -t 1 ]; then
+          skip_all=true
+        else
+          user "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
         [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
-        read -n 1 action
+          read -r -n 1 action
 
-        case "$action" in
-          o )
-            overwrite=true;;
-          O )
-            overwrite_all=true;;
-          b )
-            backup=true;;
-          B )
-            backup_all=true;;
-          s )
-            skip=true;;
-          S )
-            skip_all=true;;
-          * )
-            ;;
-        esac
+          case "$action" in
+            o )
+              overwrite=true;;
+            O )
+              overwrite_all=true;;
+            b )
+              backup=true;;
+            B )
+              backup_all=true;;
+            s )
+              skip=true;;
+            S )
+              skip_all=true;;
+            * )
+              ;;
+          esac
+        fi
 
       fi
 
@@ -184,6 +195,26 @@ install_dotfiles () {
   info 'installing dotfiles'
 
   local overwrite_all=false backup_all=false skip_all=false
+
+  case "$CONFLICT_POLICY_ARG" in
+    "")
+      if [ ! -t 0 ] || [ ! -t 1 ]; then
+        skip_all=true
+      fi
+      ;;
+    skip)
+      skip_all=true
+      ;;
+    overwrite)
+      overwrite_all=true
+      ;;
+    backup)
+      backup_all=true
+      ;;
+    *)
+      fail "invalid --conflict value: $CONFLICT_POLICY_ARG (expected: skip, overwrite, or backup)"
+      ;;
+  esac
 
   for src in $(find -H "$DOTFILES_ROOT" -maxdepth 2 -name '*.symlink' -not -path '*.git*')
   do

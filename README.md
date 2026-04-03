@@ -62,6 +62,13 @@ For unattended bootstrap, pass the Git identity explicitly:
 script/bootstrap --git-name "Your Name" --git-email "you@example.com"
 ```
 
+In non-interactive mode, existing-file conflicts default to `skip`. You can
+override that behavior with `--conflict skip|overwrite|backup`.
+
+```sh
+script/bootstrap --git-name "Your Name" --git-email "you@example.com" --conflict overwrite
+```
+
 You can also provide the same values through environment variables:
 
 ```sh
