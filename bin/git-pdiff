@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-
-if [ "$#" -gt 0 ]; then
-  git diff --color -- "$@" | diff-so-fancy | less -R --tabs=3
-else
-  git diff --color | diff-so-fancy | less -R --tabs=3
-fi
