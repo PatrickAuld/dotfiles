@@ -3,45 +3,6 @@
   path = ~/.gitconfig.local
 
 
-[alias]
-  # Pretty prints the log with colors
-  plog = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%an]" --decorate
-
-  # Pretty prints the graph with colors
-  lsgraph = log --graph --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\[%cn]" --decorate
-
-  # More verbose graph
-  llgraph = log --graph --oneline --decorate --branches --tags
-
-  # Very verbose graph
-  lllgraph = log --graph --oneline --decorate --all
-
-  # Pretty diff
-  pdiff = !git diff --color | diff-so-fancy | less -R --tabs=3
-
-  # Quick and pretty diff
-  pd = !git pdiff
-
-  # List aliases
-  la = !git config -l | grep alias | cut -c 7-
-
-  # Stage all changes that are more than just whitespace
-  addiws = !git add-ignore-whitespace
-
-  # Quick insight of Stash
-  s = !git status --short --branch
-
-  # Remove whitespace changes
-  rws = !git remove-whitespace-changes
-
-  # Deletes all branches that have been merged into `master` or `main`
-  delete-merged-branches = !git branch --merged | egrep -v '(^\\*|master|main)' | xargs git branch -d
-
-  # Pull latest using stash for local changes
-  spp = !git stash save -u && git pull && git stash pop
-
-  # Switch Default
-  sd = !git switch-default
 
 [color]
   diff = auto

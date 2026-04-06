@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+git log --pretty=format:"%C(yellow)%h%Cred%d\ %Creset%s%Cblue\ [%an]" --decorate "$@"
