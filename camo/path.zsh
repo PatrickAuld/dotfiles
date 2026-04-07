@@ -1,2 +1,1 @@
-# Camo Studio adds this on install
-export PATH="$HOME/.local/bin:$PATH"
+# PATH is managed centrally in system/path.zsh
