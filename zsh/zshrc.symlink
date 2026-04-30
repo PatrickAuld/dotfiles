@@ -33,8 +33,9 @@ do
 done
 
 # initialize autocomplete here, otherwise functions won't be loaded
+# Use insecure completions without prompting so shell startup stays non-interactive.
 autoload -U compinit
-compinit -u
+compinit -i -u
 
 # load everything but the path and completion files
 for file in ${${config_files:#*/path.zsh}:#*/completion.zsh}
