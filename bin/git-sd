@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# Moves to the "default" branch for the repo.
+# "Alias" for `switch-default`
+#
+# Examples
+#
+#   git cd
+
+git checkout-default
