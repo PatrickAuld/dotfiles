@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+# Helper function to exit safely whether the script is sourced or executed
+bail() {
+  return "$1" 2>/dev/null || exit "$1"
+}
+
+remove_wt=false
+force=false
+target_branch=""
+
+# 1. Parse arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --remove|-r) remove_wt=true; shift ;;
+    --force|-f) force=true; shift ;;
+    -*) echo "Error: Unknown option $1"; bail 1 ;;
+    *) target_branch="$1"; shift ;;
+  esac
+done
+
+if [[ -z "$target_branch" ]]; then
+  echo "Usage: source gsw.sh [--remove|-r] [--force|-f] <branch-name>"
+  bail 1
+fi
+
+# 2. Find if the branch is currently checked out in a worktree
+wt_path=$(git worktree list --porcelain | awk -v branch="refs/heads/$target_branch" '
+  /^worktree / { path = substr($0, 10) }
+  /^branch / { if ($2 == branch) print path }
+')
+
+# If no worktree is found, do a standard git switch
+if [[ -z "$wt_path" ]]; then
+  git switch "$target_branch"
+  bail $?
+fi
+
+# 3. Handle Worktree Logic
+if [[ "$remove_wt" == true ]]; then
+  
+  # Path 3: Forcible removal
+  if [[ "$force" == true ]]; then
+    echo "Forcibly removing worktree at: $wt_path"
+    git worktree remove --force "$wt_path"
+  
+  # Path 2: Safe removal (Fail on untracked/unstaged/staged)
+  else
+    echo "Checking worktree at $wt_path for uncommitted changes..."
+    changes=$(git -C "$wt_path" status --porcelain)
+    
+    if [[ -n "$changes" ]]; then
+      echo "Error: Unstaged, staged, or untracked changes exist in the worktree."
+      echo "Use --force or -f to ignore changes and remove the worktree anyway."
+      bail 1
+    fi
+    
+    echo "Worktree is clean. Removing..."
+    git worktree remove "$wt_path"
+  fi
+
+  # Switch to the branch in the current directory after removal
+  if [[ $? -eq 0 ]]; then
+    git switch "$target_branch"
+  fi
+
+else
+  # Path 1 (Default): Change terminal directory to the worktree
+  echo "Worktree found. Moving to: $wt_path"
+  cd "$wt_path" || bail 1
+fi
