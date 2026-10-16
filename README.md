@@ -90,34 +90,40 @@ environment fresh and up-to-date.
 
 ## headless VPS setup
 
-For unattended Linux servers, run as the target user (root is also supported):
+Linux defaults to headless setup. Run as the target user (root is also supported):
 
 ```sh
-script/bootstrap --headless --git-name "Your Name" --git-email "you@example.com"
+script/bootstrap --git-name "Your Name" --git-email "you@example.com"
 ```
 
 For an existing checkout that only needs dependencies:
 
 ```sh
-script/install --headless
+script/install
 ```
 
-`--headless` disables prompts and skips font downloads and font packages.
-It also works through `DOTFILES_HEADLESS=1`. Existing files default to
+`--headless` is optional on Linux. Headless setup disables prompts and skips
+font downloads and font packages. Existing files default to
 `skip`; use `--conflict backup` or `--conflict overwrite` to change that.
 Debian/Ubuntu packages are installed noninteractively, keeping existing
 configuration files. Non-root users need passwordless sudo; missing privileges
 fail immediately. Other Linux distributions need dependencies preinstalled.
+
+For a Linux desktop, use `script/bootstrap --desktop` or
+`script/install --desktop` to include fonts. macOS defaults to desktop setup.
+`DOTFILES_HEADLESS=1` or `DOTFILES_HEADLESS=0` overrides the platform default;
+explicit command-line flags take precedence.
 
 SSH text is rendered by the local terminal: install and select ComicShannsMono
 on the computer you connect from.
 
 ## fonts
 
-The font installer runs during bootstrap or can be run on its own:
+The font installer runs during desktop bootstrap or can be run on its own.
+Use this to explicitly install fonts on either platform:
 
 ```sh
-fonts/install.sh
+DOTFILES_HEADLESS=0 fonts/install.sh
 ```
 
 It installs ComicShannsMono Nerd Font (Nerd Fonts v3.5.1) into

@@ -14,6 +14,14 @@ is_linux() {
   [[ "$(os_name)" == "Linux" ]]
 }
 
+if [ -z "${DOTFILES_HEADLESS+x}" ]; then
+  DOTFILES_HEADLESS=0
+  if is_linux; then
+    DOTFILES_HEADLESS=1
+  fi
+fi
+export DOTFILES_HEADLESS
+
 require_darwin() {
   if ! is_darwin; then
     echo "Skipping (macOS-only): $0" >&2

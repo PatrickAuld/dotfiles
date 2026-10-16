@@ -109,7 +109,6 @@ esac
     def bootstrap(self):
         return self.run_script(
             "script/bootstrap",
-            "--headless",
             "--git-name", "Test User",
             "--git-email", "test@example.com",
         )
@@ -133,7 +132,7 @@ esac
 
     def test_nonroot_uses_noninteractive_sudo(self):
         self.env["MOCK_UID"] = "1000"
-        self.assert_success(self.run_script("script/install", "--headless"))
+        self.assert_success(self.run_script("script/install"))
         self.assertIn("sudo -n env DEBIAN_FRONTEND=noninteractive", self.log.read_text())
 
     def test_sudo_denial_is_failure(self):
@@ -150,13 +149,12 @@ esac
         self.assertNotIn("All installed!", result.stdout)
 
     def test_missing_identity_is_failure(self):
-        result = self.run_script("script/bootstrap", "--headless")
+        result = self.run_script("script/bootstrap")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("requires --git-name", result.stdout)
         self.assertFalse(self.log.exists())
 
     def test_font_installer_skips_before_dependencies(self):
-        self.env["DOTFILES_HEADLESS"] = "1"
         result = self.run_script("fonts/install.sh")
         self.assert_success(result)
         self.assertIn("Skipping fonts", result.stdout)
@@ -177,8 +175,36 @@ esac
         self.assertIn("sudo -n sh -s -- -y", self.log.read_text())
 
     def test_desktop_linux_keeps_font_packages(self):
+        self.env["DOTFILES_HEADLESS"] = "0"
         self.assert_success(self.run_script("linux/install.sh"))
         self.assertIn("fontconfig fonts-firacode", self.log.read_text())
+
+    def test_desktop_flag_overrides_headless_environment(self):
+        self.env["DOTFILES_HEADLESS"] = "1"
+        (self.repo / "fonts/install.sh").write_text(
+            '#!/bin/bash\n[ "$DOTFILES_HEADLESS" = 0 ]\n'
+        )
+        self.assert_success(self.run_script("script/install", "--desktop"))
+        self.assertIn("fontconfig fonts-firacode", self.log.read_text())
+
+    def test_headless_flag_overrides_desktop_environment(self):
+        self.env["DOTFILES_HEADLESS"] = "0"
+        self.assert_success(self.run_script("script/install", "--headless"))
+        self.assertNotIn("fontconfig", self.log.read_text())
+
+    def test_macos_defaults_to_desktop(self):
+        (self.bin / "uname").write_text("#!/bin/sh\necho Darwin\n")
+        result = subprocess.run(
+            ["/bin/bash", "-c",
+             'source "$1/script/util.sh"; echo "$DOTFILES_HEADLESS"',
+             "test", str(self.repo)],
+            env=self.env,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        self.assert_success(result)
+        self.assertEqual(result.stdout.strip(), "0")
 
     def test_headless_rejects_macos(self):
         (self.bin / "uname").write_text("#!/bin/sh\necho Darwin\n")

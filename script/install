@@ -18,8 +18,11 @@ while [ "$#" -gt 0 ]; do
     --headless)
       export DOTFILES_HEADLESS=1
       ;;
+    --desktop)
+      export DOTFILES_HEADLESS=0
+      ;;
     --help|-h)
-      echo "Usage: script/install [--headless]"
+      echo "Usage: script/install [--headless|--desktop] (Linux defaults to headless)"
       exit 0
       ;;
     *)
