@@ -88,6 +88,24 @@ symlinks, macOS defaults, and dependencies. The `script/install` command
 runs topic-specific installers. Run these occasionally to keep your
 environment fresh and up-to-date.
 
+## fonts
+
+The font installer runs during bootstrap or can be run on its own:
+
+```sh
+fonts/install.sh
+```
+
+It installs ComicShannsMono Nerd Font (Nerd Fonts v3.5.1) into
+`~/Library/Fonts/comic-shanns-mono` on macOS or
+`${XDG_DATA_HOME:-~/.local/share}/fonts/comic-shanns-mono` on Linux.
+Linux also installs the existing Source Code Pro fonts and refreshes the
+fontconfig cache. On Debian/Ubuntu, dependencies are installed with apt;
+other Linux systems need `curl`, `unzip`, and fontconfig installed first.
+
+After installation, select `ComicShannsMono Nerd Font` in your terminal or
+editor (or `ComicShannsMono Nerd Font Mono` for fixed-width icons).
+
 ## bugs
 
 I want this to work for everyone on macOS; that means when you clone it down it should
