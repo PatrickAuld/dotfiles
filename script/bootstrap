@@ -13,6 +13,10 @@ CONFLICT_POLICY_ARG=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --headless)
+      export DOTFILES_HEADLESS=1
+      shift
+      ;;
     --git-name)
       GIT_AUTHOR_NAME_ARG=${2:-}
       shift 2
@@ -27,9 +31,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --help|-h)
       cat <<'EOF'
-Usage: script/bootstrap [--git-name NAME] [--git-email EMAIL] [--conflict POLICY]
+Usage: script/bootstrap [--headless] [--git-name NAME] [--git-email EMAIL] [--conflict POLICY]
 
 Options:
+  --headless            Unattended Linux/VPS setup; skip fonts and never prompt
   --git-name NAME       Git author/user name for gitconfig.local
   --git-email EMAIL     Git author email for gitconfig.local
   --conflict POLICY     Conflict policy for existing files: skip|overwrite|backup
@@ -46,6 +51,11 @@ EOF
       ;;
   esac
 done
+
+if [ "${DOTFILES_HEADLESS:-0}" = 1 ] && [ "$(uname -s)" != Linux ]; then
+  echo "--headless is supported on Linux only." >&2
+  exit 1
+fi
 
 echo ''
 
@@ -64,7 +74,7 @@ success () {
 fail () {
   printf "\r\033[2K  [\033[0;31mFAIL\033[0m] $1\n"
   echo ''
-  exit
+  exit 1
 }
 
 setup_gitconfig () {
@@ -82,7 +92,7 @@ setup_gitconfig () {
     git_authoremail=${GIT_AUTHOR_EMAIL_ARG:-${DOTFILES_GIT_AUTHOREMAIL:-${GIT_AUTHOR_EMAIL:-""}}}
 
     # Non-interactive sessions (CI, scripts) must not prompt; require explicit identity.
-    if [ ! -t 0 ] || [ ! -t 1 ]; then
+    if [ "${DOTFILES_HEADLESS:-0}" = 1 ] || [ ! -t 0 ] || [ ! -t 1 ]; then
       if [ -z "$git_authorname" ] || [ -z "$git_authoremail" ]; then
         fail "non-interactive bootstrap requires --git-name and --git-email (or DOTFILES_GIT_AUTHORNAME / DOTFILES_GIT_AUTHOREMAIL)"
       fi
@@ -125,7 +135,7 @@ link_file () {
 
       else
 
-        if [ ! -t 0 ] || [ ! -t 1 ]; then
+        if [ "${DOTFILES_HEADLESS:-0}" = 1 ] || [ ! -t 0 ] || [ ! -t 1 ]; then
           skip_all=true
         else
           user "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
@@ -198,7 +208,7 @@ install_dotfiles () {
 
   case "$CONFLICT_POLICY_ARG" in
     "")
-      if [ ! -t 0 ] || [ ! -t 1 ]; then
+      if [ "${DOTFILES_HEADLESS:-0}" = 1 ] || [ ! -t 0 ] || [ ! -t 1 ]; then
         skip_all=true
       fi
       ;;
@@ -248,3 +258,4 @@ fi
 
 echo ''
 echo '  All installed!'
+

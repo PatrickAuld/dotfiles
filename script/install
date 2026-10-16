@@ -13,11 +13,41 @@ DOTFILES_ROOT=$(pwd -P)
 # shellcheck source=script/util.sh
 source "$DOTFILES_ROOT/script/util.sh"
 
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --headless)
+      export DOTFILES_HEADLESS=1
+      ;;
+    --help|-h)
+      echo "Usage: script/install [--headless]"
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+if [ "${DOTFILES_HEADLESS:-0}" = 1 ] && ! is_linux; then
+  echo "--headless is supported on Linux only." >&2
+  exit 1
+fi
+
+if is_linux; then
+  "$DOTFILES_ROOT/linux/install.sh"
+fi
+
 # Run every installer from the repository tree only; avoid traversing into
 # embedded git data and any *.symlink directories that may point outside the
 # repo or into permission-restricted trees.
 find "$DOTFILES_ROOT" \
   \( -path "$DOTFILES_ROOT/.git" -o -name '*.symlink' \) -prune -o \
   -type f -name install.sh -print | while read -r installer; do
+  if is_linux && [ "$installer" = "$DOTFILES_ROOT/linux/install.sh" ]; then
+    continue
+  fi
   "$installer"
 done
+

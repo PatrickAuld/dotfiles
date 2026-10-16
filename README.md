@@ -1,6 +1,6 @@
 # Patrick does dotfiles
 
-Your dotfiles are how you personalize your system. These are mine for macOS.
+Your dotfiles are how you personalize your system. These are mine for macOS and Linux.
 
 I was a little tired of having long alias files and everything strewn about
 (which is extremely common on other dotfiles projects, too). That led to this
@@ -88,6 +88,30 @@ symlinks, macOS defaults, and dependencies. The `script/install` command
 runs topic-specific installers. Run these occasionally to keep your
 environment fresh and up-to-date.
 
+## headless VPS setup
+
+For unattended Linux servers, run as the target user (root is also supported):
+
+```sh
+script/bootstrap --headless --git-name "Your Name" --git-email "you@example.com"
+```
+
+For an existing checkout that only needs dependencies:
+
+```sh
+script/install --headless
+```
+
+`--headless` disables prompts and skips font downloads and font packages.
+It also works through `DOTFILES_HEADLESS=1`. Existing files default to
+`skip`; use `--conflict backup` or `--conflict overwrite` to change that.
+Debian/Ubuntu packages are installed noninteractively, keeping existing
+configuration files. Non-root users need passwordless sudo; missing privileges
+fail immediately. Other Linux distributions need dependencies preinstalled.
+
+SSH text is rendered by the local terminal: install and select ComicShannsMono
+on the computer you connect from.
+
 ## fonts
 
 The font installer runs during bootstrap or can be run on its own:
@@ -125,3 +149,4 @@ weight of my changes and tweaks inspired me to finally roll my own. But Ryan's
 dotfiles were an easy way to get into bash customization, and then to jump ship
 to zsh a bit later. A decent amount of the code in these dotfiles stem or are
 inspired from Ryan's original project.
+

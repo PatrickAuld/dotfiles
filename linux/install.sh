@@ -13,21 +13,25 @@ require_linux
 echo "› Linux: installing packages (Ubuntu/Debian)"
 
 if command -v apt-get >/dev/null 2>&1; then
-  sudo apt-get update
-  sudo apt-get install -y \
-    git \
-    zsh \
-    curl \
-    ripgrep \
-    fd-find \
-    neovim \
-    direnv \
-    gh \
-    fontconfig \
-    fonts-firacode
+  apt_update
+  packages=(
+    git
+    zsh
+    curl
+    ripgrep
+    fd-find
+    neovim
+    direnv
+    gh
+  )
+  if [ "${DOTFILES_HEADLESS:-0}" != 1 ]; then
+    packages+=(fontconfig fonts-firacode)
+  fi
+  apt_install "${packages[@]}"
 else
   echo "apt-get not found; please install dependencies manually." >&2
 fi
 
 # starship is installed via starship/install.sh
+
 

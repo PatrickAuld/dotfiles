@@ -11,11 +11,11 @@ require_linux
 # Linux (Ubuntu/Debian): install via apt-get when available.
 # Ensure curl exists for the fallback installer.
 if command -v apt-get >/dev/null 2>&1; then
-  sudo apt-get update
-  sudo apt-get install -y curl
+  apt_update
+  apt_install curl
 
   if apt-cache show starship >/dev/null 2>&1; then
-    if sudo apt-get install -y starship; then
+    if apt_install starship; then
       exit 0
     fi
   else
@@ -26,10 +26,11 @@ fi
 # Fallback: official installer script
 if ! command -v starship >/dev/null 2>&1; then
   echo "› Installing starship via installer script" >&2
-  curl -fsSL https://starship.rs/install.sh | sudo sh -s -- -y
+  curl -fsSL https://starship.rs/install.sh | run_as_root sh -s -- -y
 fi
 
 if ! command -v starship >/dev/null 2>&1; then
   echo "starship installation failed" >&2
   exit 1
 fi
+

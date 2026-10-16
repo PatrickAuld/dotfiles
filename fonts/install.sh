@@ -6,13 +6,18 @@ DOTFILES_ROOT="$(cd "$(dirname "$0")/.." && pwd -P)"
 # shellcheck source=script/util.sh
 source "$DOTFILES_ROOT/script/util.sh"
 
+if [ "${DOTFILES_HEADLESS:-0}" = 1 ]; then
+  echo "Skipping fonts (headless setup; SSH fonts are rendered by the client)."
+  exit 0
+fi
+
 if is_darwin; then
   install_dir="$HOME/Library/Fonts"
 elif is_linux; then
   install_dir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
   if command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get update
-    sudo apt-get install -y fontconfig curl unzip
+    apt_update
+    apt_install fontconfig curl unzip
   fi
 else
   echo "Skipping fonts on unsupported OS: $(os_name)"
@@ -68,3 +73,4 @@ if is_linux; then
     fc-cache -f || true
   fi
 fi
+
