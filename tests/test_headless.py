@@ -4,6 +4,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+import zipfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,6 +21,22 @@ class HeadlessTest(unittest.TestCase):
         self.log = self.base / "commands"
         self.home.mkdir()
         self.bin.mkdir()
+        self.fixtures = self.base / "fixtures"
+        self.fixtures.mkdir()
+        archives = {
+            "ComicShannsMono.zip": [
+                f"ComicShannsMonoNerdFont{variant}-{weight}.otf"
+                for variant in ["", "Mono", "Propo"]
+                for weight in ["Regular", "Bold"]
+            ],
+            "source-code-pro.zip": ["OTF/SourceCodePro-Regular.otf"],
+            "SourceCodePro-nerd.zip": ["Source Code Pro Nerd Font.ttf"],
+        }
+        for archive, names in archives.items():
+            with zipfile.ZipFile(self.fixtures / archive, "w") as zipped:
+                for name in names:
+                    zipped.writestr(name, b"font fixture")
+                zipped.writestr("README.md", "not a font")
         paths = [
             "script/bootstrap",
             "script/install",
@@ -50,6 +67,7 @@ class HeadlessTest(unittest.TestCase):
             MOCK_STARSHIP_AVAILABLE="1",
             TEST_LOG=str(self.log),
             TEST_BIN=str(self.bin),
+            TEST_FIXTURES=str(self.fixtures),
         )
         for name in [
             "DOTFILES_HEADLESS",
@@ -57,6 +75,7 @@ class HeadlessTest(unittest.TestCase):
             "DOTFILES_GIT_AUTHOREMAIL",
             "GIT_AUTHOR_NAME",
             "GIT_AUTHOR_EMAIL",
+            "XDG_DATA_HOME",
         ]:
             self.env.pop(name, None)
         mocks = {
@@ -84,10 +103,13 @@ case "$*" in
     echo 'chmod +x "$TEST_BIN/starship"'
     ;;
   *nvm-sh*) ;;
-  *) exit 93 ;;
+  *)
+    while [ "$1" != -o ]; do shift; done
+    cp "$TEST_FIXTURES/$(basename "$2")" "$2"
+    ;;
 esac
 """,
-            "fc-cache": 'echo "unexpected font cache" >&2; exit 94',
+            "fc-cache": 'echo "fc-cache $*" >> "$TEST_LOG"',
             "open": 'exit 95',
             "brew": 'exit 96',
         }
@@ -123,12 +145,16 @@ esac
         self.assertEqual((self.home / ".existing").read_text(), "preserve me\n")
         commands = self.log.read_text()
         self.assertNotIn("sudo ", commands)
-        self.assertNotIn("fontconfig", commands)
-        self.assertNotIn("fonts-firacode", commands)
-        self.assertNotIn("ComicShannsMono", commands)
+        self.assertIn("fontconfig", commands)
+        self.assertIn("fonts-firacode", commands)
+        self.assertIn("ComicShannsMono.zip", commands)
         self.assertIn("--force-confold", commands)
         self.assertLess(commands.index("apt-get install"), commands.index("curl "))
-        self.assertFalse((self.home / ".local/share/fonts").exists())
+        fonts = self.home / ".local/share/fonts"
+        self.assertEqual(len(list((fonts / "comic-shanns-mono").glob("*.otf"))), 6)
+        self.assertTrue((fonts / "source-code-pro/SourceCodePro-Regular.otf").exists())
+        self.assertTrue((fonts / "nerd-fonts/Source Code Pro Nerd Font.ttf").exists())
+        self.assertEqual(commands.count("fc-cache -f"), 2)
 
     def test_nonroot_uses_noninteractive_sudo(self):
         self.env["MOCK_UID"] = "1000"
@@ -154,11 +180,28 @@ esac
         self.assertIn("requires --git-name", result.stdout)
         self.assertFalse(self.log.exists())
 
-    def test_font_installer_skips_before_dependencies(self):
+    def test_font_installer_runs_headless(self):
+        self.env["DOTFILES_HEADLESS"] = "1"
         result = self.run_script("fonts/install.sh")
         self.assert_success(result)
-        self.assertIn("Skipping fonts", result.stdout)
-        self.assertFalse(self.log.exists())
+        fonts = self.home / ".local/share/fonts/comic-shanns-mono"
+        self.assertEqual(len(list(fonts.glob("*.otf"))), 6)
+        self.assertFalse((fonts / "README.md").exists())
+        self.assertIn("fc-cache -f", self.log.read_text())
+
+    def test_font_installer_honors_xdg_directory(self):
+        self.env["XDG_DATA_HOME"] = str(self.base / "custom data")
+        self.assert_success(self.run_script("fonts/install.sh"))
+        fonts = self.base / "custom data/fonts/comic-shanns-mono"
+        self.assertEqual(len(list(fonts.glob("*.otf"))), 6)
+
+    def test_macos_installs_fonts_even_with_headless_environment(self):
+        (self.bin / "uname").write_text("#!/bin/sh\necho Darwin\n")
+        self.env["DOTFILES_HEADLESS"] = "1"
+        self.assert_success(self.run_script("fonts/install.sh"))
+        fonts = self.home / "Library/Fonts/comic-shanns-mono"
+        self.assertEqual(len(list(fonts.glob("*.otf"))), 6)
+        self.assertNotIn("apt-get", self.log.read_text())
 
     def test_starship_fallback_runs_as_root(self):
         self.env.update(DOTFILES_HEADLESS="1", MOCK_STARSHIP_AVAILABLE="0")
@@ -190,7 +233,8 @@ esac
     def test_headless_flag_overrides_desktop_environment(self):
         self.env["DOTFILES_HEADLESS"] = "0"
         self.assert_success(self.run_script("script/install", "--headless"))
-        self.assertNotIn("fontconfig", self.log.read_text())
+        self.assertIn("fontconfig", self.log.read_text())
+        self.assertIn("ComicShannsMono.zip", self.log.read_text())
 
     def test_macos_defaults_to_desktop(self):
         (self.bin / "uname").write_text("#!/bin/sh\necho Darwin\n")

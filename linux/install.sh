@@ -23,10 +23,9 @@ if command -v apt-get >/dev/null 2>&1; then
     neovim
     direnv
     gh
+    fontconfig
+    fonts-firacode
   )
-  if [ "${DOTFILES_HEADLESS:-0}" != 1 ]; then
-    packages+=(fontconfig fonts-firacode)
-  fi
   apt_install "${packages[@]}"
 else
   echo "apt-get not found; please install dependencies manually." >&2

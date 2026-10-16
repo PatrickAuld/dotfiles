@@ -42,7 +42,7 @@ Usage: script/bootstrap [--headless|--desktop] [--git-name NAME] [--git-email EM
 
 Options:
   --headless            Unattended Linux/VPS setup (default on Linux)
-  --desktop             Desktop setup including fonts (default on macOS)
+  --desktop             Allow interactive setup (default on macOS)
   --git-name NAME       Git author/user name for gitconfig.local
   --git-email EMAIL     Git author email for gitconfig.local
   --conflict POLICY     Conflict policy for existing files: skip|overwrite|backup
