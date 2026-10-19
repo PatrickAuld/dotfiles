@@ -41,8 +41,8 @@ while [[ $# -gt 0 ]]; do
 Usage: script/bootstrap [--headless|--desktop] [--git-name NAME] [--git-email EMAIL] [--conflict POLICY]
 
 Options:
-  --headless            Unattended Linux/VPS setup (default on Linux)
-  --desktop             Allow interactive setup (default on macOS)
+  --headless            Force unattended Linux/VPS setup; skip fonts
+  --desktop             Force desktop setup including fonts
   --git-name NAME       Git author/user name for gitconfig.local
   --git-email EMAIL     Git author email for gitconfig.local
   --conflict POLICY     Conflict policy for existing files: skip|overwrite|backup
@@ -50,6 +50,7 @@ Options:
 For unattended bootstrap, provide both --git-name and --git-email
 (or equivalent env vars) so gitconfig.local can be generated without prompts.
 In non-interactive mode, file conflicts default to: skip.
+Linux detects desktop versus headless setup from the session; macOS defaults to desktop.
 EOF
       exit 0
       ;;
@@ -266,4 +267,3 @@ fi
 
 echo ''
 echo '  All installed!'
-

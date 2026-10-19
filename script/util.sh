@@ -14,9 +14,17 @@ is_linux() {
   [[ "$(os_name)" == "Linux" ]]
 }
 
+has_graphical_session() {
+  if [ -n "${SSH_CONNECTION:-}${SSH_CLIENT:-}${SSH_TTY:-}" ]; then
+    return 1
+  fi
+  [[ -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ||
+     "${XDG_SESSION_TYPE:-}" == x11 || "${XDG_SESSION_TYPE:-}" == wayland ]]
+}
+
 if [ -z "${DOTFILES_HEADLESS+x}" ]; then
   DOTFILES_HEADLESS=0
-  if is_linux; then
+  if is_linux && ! has_graphical_session; then
     DOTFILES_HEADLESS=1
   fi
 fi
@@ -60,4 +68,3 @@ apt_install() {
     apt-get install -y -o Dpkg::Options::=--force-confdef \
     -o Dpkg::Options::=--force-confold "$@"
 }
-

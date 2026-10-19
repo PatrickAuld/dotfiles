@@ -22,7 +22,7 @@ while [ "$#" -gt 0 ]; do
       export DOTFILES_HEADLESS=0
       ;;
     --help|-h)
-      echo "Usage: script/install [--headless|--desktop] (Linux defaults to headless)"
+      echo "Usage: script/install [--headless|--desktop] (Linux auto-detects the session)"
       exit 0
       ;;
     *)
@@ -53,4 +53,3 @@ find "$DOTFILES_ROOT" \
   fi
   "$installer"
 done
-

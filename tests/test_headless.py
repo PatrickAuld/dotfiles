@@ -76,6 +76,12 @@ class HeadlessTest(unittest.TestCase):
             "GIT_AUTHOR_NAME",
             "GIT_AUTHOR_EMAIL",
             "XDG_DATA_HOME",
+            "DISPLAY",
+            "WAYLAND_DISPLAY",
+            "XDG_SESSION_TYPE",
+            "SSH_CONNECTION",
+            "SSH_CLIENT",
+            "SSH_TTY",
         ]:
             self.env.pop(name, None)
         mocks = {
@@ -145,16 +151,23 @@ esac
         self.assertEqual((self.home / ".existing").read_text(), "preserve me\n")
         commands = self.log.read_text()
         self.assertNotIn("sudo ", commands)
-        self.assertIn("fontconfig", commands)
-        self.assertIn("fonts-firacode", commands)
-        self.assertIn("ComicShannsMono.zip", commands)
+        self.assertNotIn("fontconfig", commands)
+        self.assertNotIn("fonts-firacode", commands)
+        self.assertNotIn("ComicShannsMono.zip", commands)
         self.assertIn("--force-confold", commands)
         self.assertLess(commands.index("apt-get install"), commands.index("curl "))
+        fonts = self.home / ".local/share/fonts"
+        self.assertFalse(fonts.exists())
+        self.assertNotIn("fc-cache", commands)
+
+    def test_desktop_bootstrap_installs_fonts_without_tty(self):
+        self.env["DISPLAY"] = ":0"
+        self.assert_success(self.bootstrap())
         fonts = self.home / ".local/share/fonts"
         self.assertEqual(len(list((fonts / "comic-shanns-mono").glob("*.otf"))), 6)
         self.assertTrue((fonts / "source-code-pro/SourceCodePro-Regular.otf").exists())
         self.assertTrue((fonts / "nerd-fonts/Source Code Pro Nerd Font.ttf").exists())
-        self.assertEqual(commands.count("fc-cache -f"), 2)
+        self.assertIn("fc-cache -f", self.log.read_text())
 
     def test_nonroot_uses_noninteractive_sudo(self):
         self.env["MOCK_UID"] = "1000"
@@ -180,24 +193,66 @@ esac
         self.assertIn("requires --git-name", result.stdout)
         self.assertFalse(self.log.exists())
 
-    def test_font_installer_runs_headless(self):
+    def test_font_installer_skips_headless_before_dependencies(self):
         self.env["DOTFILES_HEADLESS"] = "1"
+        self.env["DISPLAY"] = ":0"
         result = self.run_script("fonts/install.sh")
         self.assert_success(result)
-        fonts = self.home / ".local/share/fonts/comic-shanns-mono"
-        self.assertEqual(len(list(fonts.glob("*.otf"))), 6)
-        self.assertFalse((fonts / "README.md").exists())
-        self.assertIn("fc-cache -f", self.log.read_text())
+        self.assertIn("Skipping fonts", result.stdout)
+        self.assertFalse(self.log.exists())
+        self.assertFalse((self.home / ".local/share/fonts").exists())
 
     def test_font_installer_honors_xdg_directory(self):
+        self.env["WAYLAND_DISPLAY"] = "wayland-0"
         self.env["XDG_DATA_HOME"] = str(self.base / "custom data")
         self.assert_success(self.run_script("fonts/install.sh"))
         fonts = self.base / "custom data/fonts/comic-shanns-mono"
         self.assertEqual(len(list(fonts.glob("*.otf"))), 6)
 
-    def test_macos_installs_fonts_even_with_headless_environment(self):
+    def test_font_installer_skips_ssh_with_x11_forwarding(self):
+        self.env.update(DISPLAY="localhost:10.0", SSH_CONNECTION="client 123 server 22")
+        self.assert_success(self.run_script("fonts/install.sh"))
+        self.assertFalse(self.log.exists())
+        self.assertFalse((self.home / ".local/share/fonts").exists())
+
+    def test_font_installer_can_force_desktop_on_headless_host(self):
+        self.env["DOTFILES_HEADLESS"] = "0"
+        self.assert_success(self.run_script("fonts/install.sh"))
+        fonts = self.home / ".local/share/fonts/comic-shanns-mono"
+        self.assertEqual(len(list(fonts.glob("*.otf"))), 6)
+        self.assertFalse((fonts / "README.md").exists())
+
+    def test_linux_detects_graphical_and_headless_sessions(self):
+        cases = [
+            ({}, "1"),
+            ({"XDG_SESSION_TYPE": "tty"}, "1"),
+            ({"DISPLAY": ":0"}, "0"),
+            ({"WAYLAND_DISPLAY": "wayland-0"}, "0"),
+            ({"XDG_SESSION_TYPE": "x11"}, "0"),
+            ({"XDG_SESSION_TYPE": "wayland"}, "0"),
+            ({"DISPLAY": "localhost:10.0", "SSH_CONNECTION": "client 123 server 22"}, "1"),
+            ({"WAYLAND_DISPLAY": "wayland-0", "SSH_TTY": "/dev/pts/0"}, "1"),
+            ({"DISPLAY": ":0", "SSH_CLIENT": "client 123 22"}, "1"),
+            ({"DISPLAY": ":0", "DOTFILES_HEADLESS": "1"}, "1"),
+            ({"SSH_CONNECTION": "client 123 server 22", "DOTFILES_HEADLESS": "0"}, "0"),
+        ]
+        for overrides, expected in cases:
+            with self.subTest(overrides=overrides):
+                result = subprocess.run(
+                    ["/bin/bash", "-c",
+                     'source "$1/script/util.sh"; echo "$DOTFILES_HEADLESS"',
+                     "test", str(self.repo)],
+                    env=dict(self.env, **overrides),
+                    stdin=subprocess.DEVNULL,
+                    capture_output=True,
+                    text=True,
+                    timeout=15,
+                )
+                self.assert_success(result)
+                self.assertEqual(result.stdout.strip(), expected)
+
+    def test_macos_installs_fonts_by_default(self):
         (self.bin / "uname").write_text("#!/bin/sh\necho Darwin\n")
-        self.env["DOTFILES_HEADLESS"] = "1"
         self.assert_success(self.run_script("fonts/install.sh"))
         fonts = self.home / "Library/Fonts/comic-shanns-mono"
         self.assertEqual(len(list(fonts.glob("*.otf"))), 6)
@@ -233,8 +288,8 @@ esac
     def test_headless_flag_overrides_desktop_environment(self):
         self.env["DOTFILES_HEADLESS"] = "0"
         self.assert_success(self.run_script("script/install", "--headless"))
-        self.assertIn("fontconfig", self.log.read_text())
-        self.assertIn("ComicShannsMono.zip", self.log.read_text())
+        self.assertNotIn("fontconfig", self.log.read_text())
+        self.assertNotIn("ComicShannsMono.zip", self.log.read_text())
 
     def test_macos_defaults_to_desktop(self):
         (self.bin / "uname").write_text("#!/bin/sh\necho Darwin\n")

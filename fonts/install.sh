@@ -6,6 +6,11 @@ DOTFILES_ROOT="$(cd "$(dirname "$0")/.." && pwd -P)"
 # shellcheck source=script/util.sh
 source "$DOTFILES_ROOT/script/util.sh"
 
+if [ "$DOTFILES_HEADLESS" = 1 ]; then
+  echo "Skipping fonts (headless install)."
+  exit 0
+fi
+
 if is_darwin; then
   install_dir="$HOME/Library/Fonts"
 elif is_linux; then
@@ -68,4 +73,3 @@ if is_linux; then
     fc-cache -f || true
   fi
 fi
-

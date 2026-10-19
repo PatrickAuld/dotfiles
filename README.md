@@ -90,7 +90,12 @@ environment fresh and up-to-date.
 
 ## headless VPS setup
 
-Linux defaults to headless setup. Run as the target user (root is also supported):
+Linux automatically selects headless setup when there is no X11 or Wayland
+session, or when running over SSH (including X11 forwarding). A local
+`DISPLAY`, `WAYLAND_DISPLAY`, or `XDG_SESSION_TYPE=x11|wayland` selects desktop
+setup. macOS defaults to desktop setup.
+
+Run as the target user (root is also supported):
 
 ```sh
 script/bootstrap --git-name "Your Name" --git-email "you@example.com"
@@ -102,25 +107,26 @@ For an existing checkout that only needs dependencies:
 script/install
 ```
 
-`--headless` is optional on Linux. Headless setup disables prompts.
-Fonts are always installed on macOS and Linux. Existing files default to
-`skip`; use `--conflict backup` or `--conflict overwrite` to change that.
+Headless setup disables prompts and skips font packages, downloads, and cache
+refreshes. Desktop setup installs fonts even when run without a TTY.
+Existing files default to `skip`; use `--conflict backup` or
+`--conflict overwrite` to change that.
 Debian/Ubuntu packages are installed noninteractively, keeping existing
 configuration files. Non-root users need passwordless sudo; missing privileges
 fail immediately. Other Linux distributions need dependencies preinstalled.
 
-For interactive Linux setup, use `script/bootstrap --desktop` or
-`script/install --desktop`. macOS defaults to desktop setup.
-`DOTFILES_HEADLESS=1` or `DOTFILES_HEADLESS=0` overrides the platform default;
-explicit command-line flags take precedence.
+Use `--headless` or `--desktop` with bootstrap or install to override detection.
+`DOTFILES_HEADLESS=1` or `DOTFILES_HEADLESS=0` also overrides detection;
+explicit command-line flags take precedence. Use the environment variable for
+the standalone font installer, e.g. `DOTFILES_HEADLESS=0 fonts/install.sh`.
 
 SSH text is rendered by the local terminal: install and select ComicShannsMono
 on the computer you connect from.
 
 ## fonts
 
-The font installer runs during every bootstrap, including headless VPS setup,
-or can be run on its own on either platform:
+The font installer runs during desktop bootstrap and skips headless installs.
+It can also be run on its own, using the same detection:
 
 ```sh
 fonts/install.sh
@@ -155,4 +161,3 @@ weight of my changes and tweaks inspired me to finally roll my own. But Ryan's
 dotfiles were an easy way to get into bash customization, and then to jump ship
 to zsh a bit later. A decent amount of the code in these dotfiles stem or are
 inspired from Ryan's original project.
-
